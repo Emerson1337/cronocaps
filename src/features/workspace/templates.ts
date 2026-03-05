@@ -71,15 +71,15 @@ function buildWorkspace(
 // --- CAPS AD ---
 function createCapsAD(): Workspace {
   const [manha, tarde] = makeShifts([
-    { label: "Manha", start: "07:00", end: "12:00" },
+    { label: "Manhã", start: "07:00", end: "12:00" },
     { label: "Tarde", start: "13:00", end: "17:00" },
   ]) as [Shift, Shift];
   const shifts = [manha, tarde];
   const [psi, enf, ass, med, to, rd] = makeCategories([
-    { name: "Psicologo(a)", color: "#10B981" },
+    { name: "Psicólogo(a)", color: "#10B981" },
     { name: "Enfermeiro(a)", color: "#3B82F6" },
     { name: "Assistente Social", color: "#8B5CF6" },
-    { name: "Medico(a)", color: "#EF4444" },
+    { name: "Médico(a)", color: "#EF4444" },
     { name: "Terapeuta Ocupacional", color: "#F59E0B" },
     { name: "Redutor(a) de Danos", color: "#F97316" },
   ]) as [Category, Category, Category, Category, Category, Category];
@@ -87,12 +87,12 @@ function createCapsAD(): Workspace {
   const days = DEFAULT_WEEKDAYS;
   const adPresets = [
     "Acolhimento Inicial",
-    "Grupo Terapeutico",
-    "Grupo de Prevencao a Recaida",
+    "Grupo Terapêutico",
+    "Grupo de Prevenção à Recaída",
     "Atendimento Individual",
-    "Oficina Terapeutica",
-    "Consulta Medica",
-    "Reducao de Danos",
+    "Oficina Terapêutica",
+    "Consulta Médica",
+    "Redução de Danos",
     "Atendimento Familiar",
   ];
   const pros = [
@@ -112,8 +112,8 @@ export const TEMPLATES: ReadonlyArray<TemplateInfo> = [
     id: "caps-ad",
     name: "CAPS AD",
     description:
-      "Especializado em alcool e outras drogas. Inclui reducao de danos e prevencao a recaida.",
-    tags: ["Alcool e drogas", "2 turnos", "7 profissionais"],
+      "Especializado em álcool e outras drogas. Inclui redução de danos e prevenção à recaída.",
+    tags: ["Álcool e drogas", "2 turnos", "7 profissionais"],
     create: createCapsAD,
   },
 ];

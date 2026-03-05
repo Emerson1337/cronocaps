@@ -14,6 +14,10 @@ import { Input } from "@/components/ui";
 import { ExportPreviewModal } from "@/components/export";
 import { DndProvider } from "@/components/dnd";
 import { ActivityLabelModal } from "@/features/rooms/activity-label-modal";
+import { MoveConflictDialog } from "@/components/board/MoveConflictDialog";
+import { ClipboardProvider, useClipboard } from "@/contexts/clipboard-context";
+import { ToastProvider, useToast } from "@/components/ui/toast";
+import { generateId } from "@/lib/utils";
 import {
   validateWorkspace,
   ConflictSummaryPanel,
@@ -26,7 +30,31 @@ interface PendingRoomDrop {
   readonly shiftId: string;
 }
 
+interface PendingAllocationMove {
+  readonly allocationId: string;
+  readonly targetDay: WeekDay;
+  readonly targetShiftId: string;
+  readonly unavailableProfessionals: ReadonlyArray<{
+    readonly id: string;
+    readonly name: string;
+  }>;
+  readonly availableProfessionalIds: ReadonlyArray<string>;
+  readonly activityLabel: string;
+}
+
 export default function WorkspacePage() {
+  return (
+    <ClipboardProvider>
+      <ToastProvider>
+        <WorkspacePageInner />
+      </ToastProvider>
+    </ClipboardProvider>
+  );
+}
+
+function WorkspacePageInner() {
+  const { copiedRoom, copyRoom, clearClipboard } = useClipboard();
+  const { showToast } = useToast();
   const router = useRouter();
   const {
     workspace,
@@ -61,8 +89,12 @@ export default function WorkspacePage() {
   const [selectedAllocationId, setSelectedAllocationId] = useState<
     string | null
   >(null);
+  const [isRoomsSummaryOpen, setIsRoomsSummaryOpen] = useState(false);
   const [pendingRoomDrop, setPendingRoomDrop] =
     useState<PendingRoomDrop | null>(null);
+  const [pendingAllocationMove, setPendingAllocationMove] =
+    useState<PendingAllocationMove | null>(null);
+
   useEffect(() => {
     if (isLoaded && workspace === null) {
       router.replace("/");
@@ -134,6 +166,66 @@ export default function WorkspacePage() {
     [workspace, schedule]
   );
 
+  const handleAllocationMove = useCallback(
+    (allocationId: string, targetDay: WeekDay, targetShiftId: string) => {
+      if (workspace === null) return;
+      const allocation = workspace.allocations.find(
+        (a) => a.id === allocationId
+      );
+      if (allocation === undefined) return;
+
+      const assignedProfIds = allocation.assignments.map(
+        (a) => a.professionalId
+      );
+      if (assignedProfIds.length === 0) {
+        schedule.moveAllocation(allocationId, targetDay, targetShiftId);
+        return;
+      }
+
+      const unavailable: Array<{ id: string; name: string }> = [];
+      const availableIds: string[] = [];
+
+      for (const profId of assignedProfIds) {
+        const prof = workspace.professionals.find((p) => p.id === profId);
+        if (prof === undefined) continue;
+
+        const isAvailable = prof.availability.some(
+          (slot) => slot.day === targetDay && slot.shiftId === targetShiftId
+        );
+        if (isAvailable) {
+          availableIds.push(profId);
+        } else {
+          unavailable.push({ id: profId, name: prof.name });
+        }
+      }
+
+      if (unavailable.length === 0) {
+        schedule.moveAllocation(allocationId, targetDay, targetShiftId);
+      } else {
+        setPendingAllocationMove({
+          allocationId,
+          targetDay,
+          targetShiftId,
+          unavailableProfessionals: unavailable,
+          availableProfessionalIds: availableIds,
+          activityLabel: allocation.activityLabel,
+        });
+      }
+    },
+    [workspace, schedule]
+  );
+
+  const handleMoveConflictConfirm = useCallback(() => {
+    if (pendingAllocationMove === null) return;
+    schedule.moveAllocation(
+      pendingAllocationMove.allocationId,
+      pendingAllocationMove.targetDay,
+      pendingAllocationMove.targetShiftId,
+      pendingAllocationMove.availableProfessionalIds
+    );
+    setPendingAllocationMove(null);
+  }, [pendingAllocationMove, schedule]);
+
   const handleActivityConfirm = useCallback(
     (activityLabel: string) => {
       if (pendingRoomDrop === null) return;
@@ -162,6 +254,68 @@ export default function WorkspacePage() {
     [schedule]
   );
 
+  const handleAllocationCopy = useCallback(
+    (allocationId: string) => {
+      if (workspace === null) return;
+      const allocation = workspace.allocations.find(
+        (a) => a.id === allocationId
+      );
+      if (allocation === undefined) return;
+      copyRoom({
+        activityLabel: allocation.activityLabel,
+        assignments: allocation.assignments,
+      });
+      showToast(`Sala "${allocation.activityLabel}" copiada`, "success");
+    },
+    [workspace, copyRoom, showToast]
+  );
+
+  const handlePaste = useCallback(
+    (day: WeekDay, shiftId: string) => {
+      if (workspace === null || copiedRoom === null) return;
+
+      const availableAssignments = copiedRoom.assignments.filter((assign) => {
+        const prof = workspace.professionals.find(
+          (p) => p.id === assign.professionalId
+        );
+        if (prof === undefined) return false;
+        return prof.availability.some(
+          (slot) => slot.day === day && slot.shiftId === shiftId
+        );
+      });
+
+      const newAllocationId = generateId();
+      undoableUpdate((prev) => ({
+        ...prev,
+        allocations: [
+          ...prev.allocations,
+          {
+            id: newAllocationId,
+            day,
+            shiftId,
+            activityLabel: copiedRoom.activityLabel,
+            assignments: availableAssignments,
+          },
+        ],
+        updatedAt: new Date().toISOString(),
+      }));
+
+      const removedCount =
+        copiedRoom.assignments.length - availableAssignments.length;
+      if (removedCount > 0) {
+        showToast(
+          `Sala colada. ${String(removedCount)} profissional(is) removido(s) por indisponibilidade.`,
+          "info"
+        );
+      } else {
+        showToast(`Sala "${copiedRoom.activityLabel}" colada`, "success");
+      }
+
+      clearClipboard();
+    },
+    [workspace, copiedRoom, undoableUpdate, showToast, clearClipboard]
+  );
+
   const getConflictStyleForAllocation = useCallback(
     (allocationId: string): string => {
       return getAllocationConflictStyle(conflicts, allocationId);
@@ -181,6 +335,7 @@ export default function WorkspacePage() {
     <DndProvider
       onRoomDrop={handleRoomDrop}
       onProfessionalDrop={handleProfessionalDrop}
+      onAllocationMove={handleAllocationMove}
     >
       <main className="flex flex-col h-dvh overflow-hidden animate-fade-in">
         {/* Floating toolbar (top-right) */}
@@ -193,6 +348,8 @@ export default function WorkspacePage() {
           canRedo={canRedo}
           onUndo={undo}
           onRedo={redo}
+          showRoomsSummary={isRoomsSummaryOpen}
+          onToggleRoomsSummary={() => setIsRoomsSummaryOpen((prev) => !prev)}
         />
 
         {/* Centered workspace name */}
@@ -234,7 +391,13 @@ export default function WorkspacePage() {
           onAllocationTap={handleAllocationTap}
           onAllocationQuickAdd={handleAllocationQuickAdd}
           onAllocationRemove={handleAllocationRemove}
+          onAllocationCopy={handleAllocationCopy}
+          onPaste={handlePaste}
+          hasClipboard={copiedRoom !== null}
           getConflictStyle={getConflictStyleForAllocation}
+          showDetails={isRoomsSummaryOpen}
+          professionals={workspace.professionals}
+          categories={workspace.categories}
         />
 
         {/* Activity label modal (after room drop) */}
@@ -258,6 +421,17 @@ export default function WorkspacePage() {
           onAddAssignment={schedule.addAssignment}
           onRemoveAssignment={schedule.removeAssignment}
           onUpdateAssignment={schedule.updateAssignment}
+        />
+
+        {/* Move Conflict Dialog */}
+        <MoveConflictDialog
+          open={pendingAllocationMove !== null}
+          onClose={() => setPendingAllocationMove(null)}
+          onConfirm={handleMoveConflictConfirm}
+          unavailableProfessionals={
+            pendingAllocationMove?.unavailableProfessionals ?? []
+          }
+          activityLabel={pendingAllocationMove?.activityLabel ?? ""}
         />
 
         {/* Conflict Summary Panel */}

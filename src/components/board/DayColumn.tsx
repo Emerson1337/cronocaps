@@ -4,7 +4,7 @@ import React from "react";
 import { WEEKDAY_LABELS } from "@/lib/constants";
 import { ShiftSection } from "./ShiftSection";
 import { DroppableShiftZone } from "@/components/dnd/DroppableShiftZone";
-import type { Allocation, Shift, WeekDay } from "@/types";
+import type { Allocation, Shift, WeekDay, Professional, Category } from "@/types";
 
 interface DayColumnProps {
   readonly day: WeekDay;
@@ -14,7 +14,13 @@ interface DayColumnProps {
   readonly onAllocationTap: (allocationId: string) => void;
   readonly onAllocationQuickAdd: (allocationId: string) => void;
   readonly onAllocationRemove: (allocationId: string) => void;
+  readonly onAllocationCopy?: ((allocationId: string) => void) | undefined;
+  readonly onPaste?: ((day: WeekDay, shiftId: string) => void) | undefined;
+  readonly hasClipboard?: boolean | undefined;
   readonly getConflictStyle: (allocationId: string) => string;
+  readonly showDetails?: boolean | undefined;
+  readonly professionals?: ReadonlyArray<Professional> | undefined;
+  readonly categories?: ReadonlyArray<Category> | undefined;
 }
 
 function DayColumnComponent({
@@ -25,7 +31,13 @@ function DayColumnComponent({
   onAllocationTap,
   onAllocationQuickAdd,
   onAllocationRemove,
+  onAllocationCopy,
+  onPaste,
+  hasClipboard,
   getConflictStyle,
+  showDetails,
+  professionals,
+  categories,
 }: DayColumnProps) {
   return (
     <div className="flex flex-col gap-3 w-full min-w-0">
@@ -55,7 +67,13 @@ function DayColumnComponent({
                 onAllocationTap={onAllocationTap}
                 onAllocationQuickAdd={onAllocationQuickAdd}
                 onAllocationRemove={onAllocationRemove}
+                onAllocationCopy={onAllocationCopy}
+                onPaste={onPaste != null ? () => onPaste(day, shift.id) : undefined}
+                hasClipboard={hasClipboard}
                 getConflictStyle={getConflictStyle}
+                showDetails={showDetails}
+                professionals={professionals}
+                categories={categories}
               />
             </DroppableShiftZone>
           );

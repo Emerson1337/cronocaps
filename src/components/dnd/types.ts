@@ -1,5 +1,5 @@
 /** Discriminator for drag item types */
-export type DragItemType = "room" | "professional";
+export type DragItemType = "room" | "professional" | "allocation";
 
 export interface RoomDragData {
   readonly type: "room";
@@ -13,7 +13,15 @@ export interface ProfessionalDragData {
   readonly availability: ReadonlyArray<{ readonly day: string; readonly shiftId: string }>;
 }
 
-export type DragData = RoomDragData | ProfessionalDragData;
+export interface AllocationDragData {
+  readonly type: "allocation";
+  readonly allocationId: string;
+  readonly sourceDay: string;
+  readonly sourceShiftId: string;
+  readonly activityLabel: string;
+}
+
+export type DragData = RoomDragData | ProfessionalDragData | AllocationDragData;
 
 /**
  * Drop target ID format conventions:

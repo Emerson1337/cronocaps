@@ -21,7 +21,7 @@ export function ProfessionalListPanel({
   onEditProfessional,
   onAddProfessional,
 }: ProfessionalListPanelProps) {
-  const { getProfessionalsByCategory, isProfessionalAllocated } = useProfessionals({
+  const { getProfessionalsByCategory, isProfessionalAllocated, getProfessionalAllocations } = useProfessionals({
     workspace,
     updateWorkspace,
   });
@@ -143,6 +143,8 @@ export function ProfessionalListPanel({
                 <div className="border-t border-border divide-y divide-border">
                   {profs.map((prof) => {
                     const allocated = isProfessionalAllocated(prof.id);
+                    const allocs = getProfessionalAllocations(prof.id);
+                    const uniqueRoomCount = new Set(allocs.map((a) => a.activityLabel)).size;
                     return (
                       <div
                         key={prof.id}
@@ -155,6 +157,11 @@ export function ProfessionalListPanel({
                             </span>
                             {allocated && (
                               <span className="inline-block w-2 h-2 rounded-full bg-primary shrink-0" title="Alocado na agenda" />
+                            )}
+                            {uniqueRoomCount > 0 && (
+                              <span className="text-xs text-primary font-medium">
+                                ({uniqueRoomCount} {uniqueRoomCount === 1 ? "sala" : "salas"})
+                              </span>
                             )}
                           </div>
                           <p className="text-xs text-text-secondary truncate">

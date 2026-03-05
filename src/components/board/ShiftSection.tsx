@@ -1,10 +1,14 @@
 "use client";
 
 import React from "react";
+import { ClipboardPaste } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui";
 import { RoomBoardCard } from "@/features/rooms/room-board-card";
+import type { AssignmentDetail } from "@/features/rooms/room-board-card";
 import { DroppableRoomTarget } from "@/components/dnd/DroppableRoomTarget";
-import type { Allocation, Shift } from "@/types";
+import { DraggableAllocation } from "@/components/dnd/DraggableAllocation";
+import type { Allocation, Shift, Professional, Category } from "@/types";
 
 interface ShiftSectionProps {
   readonly shift: Shift;
@@ -15,7 +19,13 @@ interface ShiftSectionProps {
   readonly onAllocationTap: (allocationId: string) => void;
   readonly onAllocationQuickAdd: (allocationId: string) => void;
   readonly onAllocationRemove: (allocationId: string) => void;
+  readonly onAllocationCopy?: ((allocationId: string) => void) | undefined;
+  readonly onPaste?: (() => void) | undefined;
+  readonly hasClipboard?: boolean | undefined;
   readonly getConflictStyle: (allocationId: string) => string;
+  readonly showDetails?: boolean | undefined;
+  readonly professionals?: ReadonlyArray<Professional> | undefined;
+  readonly categories?: ReadonlyArray<Category> | undefined;
 }
 
 function ShiftSectionComponent({
@@ -27,7 +37,13 @@ function ShiftSectionComponent({
   onAllocationTap,
   onAllocationQuickAdd,
   onAllocationRemove,
+  onAllocationCopy,
+  onPaste,
+  hasClipboard,
   getConflictStyle,
+  showDetails,
+  professionals,
+  categories,
 }: ShiftSectionProps) {
   const isEmpty = allocations.length === 0;
 
@@ -45,11 +61,34 @@ function ShiftSectionComponent({
     >
       <div className="flex items-center gap-2">
         <span className="text-xs font-semibold uppercase text-text-secondary tracking-wide">
-          🕐 {shift.label}
+          {shift.label === "Manhã"
+            ? "☀️"
+            : shift.label === "Tarde"
+              ? "🌥️"
+              : shift.label === "Noite"
+                ? "🌙"
+                : "🕐"}{" "}
+          {shift.label}
         </span>
         <span className="text-xs text-text-secondary">
           ({shift.startTime}&ndash;{shift.endTime})
         </span>
+        {onPaste != null && (
+          <Button
+            variant="ghost"
+            onClick={hasClipboard === true ? onPaste : undefined}
+            className={cn(
+              "ml-auto text-xs px-2 py-1 h-auto gap-1 transition-opacity",
+              hasClipboard === true
+                ? "opacity-100"
+                : "opacity-0 pointer-events-none"
+            )}
+            tabIndex={hasClipboard === true ? 0 : -1}
+          >
+            <ClipboardPaste size={14} aria-hidden="true" />
+            Colar sala
+          </Button>
+        )}
       </div>
 
       {isEmpty ? (
@@ -61,7 +100,9 @@ function ShiftSectionComponent({
               : "border-border text-text-secondary animate-empty-zone-breathe"
           )}
         >
-          <span className="text-sm text-center animate-fade-in">{"Arraste uma sala para cá"}</span>
+          <span className="text-sm text-center animate-fade-in">
+            {"Arraste uma sala para cá"}
+          </span>
         </div>
       ) : (
         <div className="flex flex-col gap-2">
@@ -69,25 +110,54 @@ function ShiftSectionComponent({
             const conflictClassName = getConflictStyle(allocation.id);
             const hasConflict = conflictClassName.length > 0;
 
+            let assignmentDetails: ReadonlyArray<AssignmentDetail> | undefined;
+            if (showDetails === true && professionals != null && categories != null) {
+              assignmentDetails = allocation.assignments.map((a) => {
+                const prof = professionals.find((p) => p.id === a.professionalId);
+                const cat = prof != null ? categories.find((c) => c.id === prof.categoryId) : undefined;
+                return {
+                  professionalName: prof?.name ?? "Desconhecido",
+                  categoryName: cat?.name ?? "",
+                  categoryColor: cat?.color ?? "#999",
+                };
+              });
+            }
+
             return (
-              <DroppableRoomTarget
+              <DraggableAllocation
                 key={allocation.id}
                 allocationId={allocation.id}
-                day={allocation.day}
-                shiftId={allocation.shiftId}
-                assignedProfessionalIds={allocation.assignments.map((a) => a.professionalId)}
+                sourceDay={allocation.day}
+                sourceShiftId={allocation.shiftId}
+                activityLabel={allocation.activityLabel}
               >
-                <RoomBoardCard
-                  slotNumber={index + 1}
-                  activityLabel={allocation.activityLabel}
-                  assignmentCount={allocation.assignments.length}
-                  onTap={() => onAllocationTap(allocation.id)}
-                  onQuickAdd={() => onAllocationQuickAdd(allocation.id)}
-                  onRemove={() => onAllocationRemove(allocation.id)}
-                  hasConflict={hasConflict}
-                  className={conflictClassName}
-                />
-              </DroppableRoomTarget>
+                <DroppableRoomTarget
+                  allocationId={allocation.id}
+                  day={allocation.day}
+                  shiftId={allocation.shiftId}
+                  assignedProfessionalIds={allocation.assignments.map(
+                    (a) => a.professionalId
+                  )}
+                >
+                  <RoomBoardCard
+                    slotNumber={index + 1}
+                    activityLabel={allocation.activityLabel}
+                    assignmentCount={allocation.assignments.length}
+                    onTap={() => onAllocationTap(allocation.id)}
+                    onQuickAdd={() => onAllocationQuickAdd(allocation.id)}
+                    onRemove={() => onAllocationRemove(allocation.id)}
+                    onCopy={
+                      onAllocationCopy != null
+                        ? () => onAllocationCopy(allocation.id)
+                        : undefined
+                    }
+                    hasConflict={hasConflict}
+                    className={conflictClassName}
+                    showDetails={showDetails}
+                    assignmentDetails={assignmentDetails}
+                  />
+                </DroppableRoomTarget>
+              </DraggableAllocation>
             );
           })}
         </div>

@@ -13,8 +13,8 @@ const DEFAULT_ACTIVITY_PRESETS: ReadonlyArray<string> = [
   "Psicoterapia Individual",
   "Acolhimento Inicial",
   "Acolhimento de Seguimento",
-  "Grupo Terapeutico",
-  "Consulta Medica",
+  "Grupo Terapêutico",
+  "Consulta Médica",
   "Atendimento de Enfermagem",
 ];
 

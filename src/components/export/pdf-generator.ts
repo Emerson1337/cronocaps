@@ -50,7 +50,7 @@ function formatTimeLabel(time: string): string {
 }
 
 function formatTimeRange(startTime: string, endTime: string): string {
-  return `${formatTimeLabel(startTime)} as ${formatTimeLabel(endTime)}`;
+  return `${formatTimeLabel(startTime)} às ${formatTimeLabel(endTime)}`;
 }
 
 function hexToRgb(hex: string): RGBTuple {
@@ -163,6 +163,7 @@ export function generateSchedulePdf(input: PdfGeneratorInput): void {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   let currentPage = 1;
+  const handledPages = new Set<number>([1]);
 
   // ── Header / Footer ──────────────────────────────────────────
 
@@ -213,6 +214,7 @@ export function generateSchedulePdf(input: PdfGeneratorInput): void {
     drawFooter();
     doc.addPage();
     currentPage += 1;
+    handledPages.add(currentPage);
     drawHeader();
   }
 
@@ -401,9 +403,12 @@ export function generateSchedulePdf(input: PdfGeneratorInput): void {
           minCellHeight: 10,
         },
         didDrawPage: () => {
-          // Only draw footer/header for autotable page breaks
+          // Only draw footer/header for autotable page breaks (skip already-handled pages)
+          const pageNum = doc.getNumberOfPages();
+          if (handledPages.has(pageNum)) return;
+          handledPages.add(pageNum);
           drawFooter();
-          currentPage += 1;
+          currentPage = pageNum;
           drawHeader();
         },
       };

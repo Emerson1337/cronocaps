@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Undo2, Redo2 } from "lucide-react";
+import { Undo2, Redo2, LayoutList } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/toggle";
 import { ConflictBadge } from "@/features/validation";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,8 @@ interface FloatingToolbarProps {
   readonly canRedo: boolean;
   readonly onUndo: () => void;
   readonly onRedo: () => void;
+  readonly showRoomsSummary: boolean;
+  readonly onToggleRoomsSummary: () => void;
 }
 
 export function FloatingToolbar({
@@ -26,6 +28,8 @@ export function FloatingToolbar({
   canRedo,
   onUndo,
   onRedo,
+  showRoomsSummary,
+  onToggleRoomsSummary,
 }: FloatingToolbarProps) {
   return (
     <div className="fixed top-2 right-2 sm:top-4 sm:right-4 z-50 flex items-center gap-1 rounded-xl border border-border bg-surface-card/80 backdrop-blur-sm px-1.5 py-1 sm:px-2 sm:py-1.5 shadow-lg">
@@ -71,6 +75,21 @@ export function FloatingToolbar({
 
       <button
         type="button"
+        onClick={onToggleRoomsSummary}
+        className={cn(
+          "flex items-center justify-center w-9 h-9 rounded-lg transition-colors cursor-pointer",
+          showRoomsSummary
+            ? "text-primary bg-primary/10"
+            : "text-text-secondary hover:text-text-primary hover:bg-surface"
+        )}
+        aria-label="Detalhes das salas"
+        title="Detalhes das salas"
+      >
+        <LayoutList size={18} />
+      </button>
+
+      <button
+        type="button"
         onClick={onExport}
         className="flex items-center justify-center w-9 h-9 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface transition-colors cursor-pointer"
         aria-label="Exportar PDF"
@@ -88,8 +107,8 @@ export function FloatingToolbar({
       <Link
         href="/area-de-trabalho/configuracoes"
         className="flex items-center justify-center w-9 h-9 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface transition-colors"
-        aria-label="Configuracoes"
-        title="Configuracoes"
+        aria-label="Configurações"
+        title="Configurações"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="3" />

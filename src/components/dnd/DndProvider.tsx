@@ -60,6 +60,22 @@ function extractDragData(data: Record<string, unknown>): DragData | null {
     };
   }
 
+  if (
+    data["type"] === "allocation" &&
+    typeof data["allocationId"] === "string" &&
+    typeof data["sourceDay"] === "string" &&
+    typeof data["sourceShiftId"] === "string" &&
+    typeof data["activityLabel"] === "string"
+  ) {
+    return {
+      type: "allocation",
+      allocationId: data["allocationId"],
+      sourceDay: data["sourceDay"],
+      sourceShiftId: data["sourceShiftId"],
+      activityLabel: data["activityLabel"],
+    };
+  }
+
   return null;
 }
 
@@ -69,6 +85,11 @@ interface DndProviderProps {
   readonly onProfessionalDrop: (
     professionalId: string,
     allocationId: string
+  ) => void;
+  readonly onAllocationMove?: (
+    allocationId: string,
+    targetDay: WeekDay,
+    targetShiftId: string
   ) => void;
 }
 
@@ -88,6 +109,7 @@ export function DndProvider({
   children,
   onRoomDrop,
   onProfessionalDrop,
+  onAllocationMove,
 }: DndProviderProps) {
   const [activeDragItem, setActiveDragItem] = useState<DragData | null>(null);
 
@@ -162,9 +184,35 @@ export function DndProvider({
             onProfessionalDrop(profId, allocationId);
           });
         }
+      } else if (dragData.type === "allocation" && onAllocationMove != null) {
+        let parsed = parseShiftDropId(overId);
+
+        if (parsed === null && event.collisions != null) {
+          for (const collision of event.collisions) {
+            const cid = String(collision.id);
+            if (cid.startsWith(SHIFT_DROP_PREFIX)) {
+              parsed = parseShiftDropId(cid);
+              break;
+            }
+          }
+        }
+
+        if (parsed !== null && isWeekDay(parsed.day)) {
+          const sourceDay = dragData.sourceDay;
+          const sourceShiftId = dragData.sourceShiftId;
+          const targetDay = parsed.day;
+          const targetShiftId = parsed.shiftId;
+
+          if (sourceDay !== targetDay || sourceShiftId !== targetShiftId) {
+            const allocId = dragData.allocationId;
+            requestAnimationFrame(() => {
+              onAllocationMove(allocId, targetDay, targetShiftId);
+            });
+          }
+        }
       }
     },
-    [onRoomDrop, onProfessionalDrop]
+    [onRoomDrop, onProfessionalDrop, onAllocationMove]
   );
 
   const handleDragCancel = useCallback(() => {

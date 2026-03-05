@@ -9,7 +9,13 @@ import { IconButton } from "@/components/ui/icon-button";
 import { generateId } from "@/lib/utils";
 import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { WEEKDAY_LABELS, MAX_ROOMS, MAX_PROFESSIONALS, MAX_CATEGORIES } from "@/lib/constants";
+import {
+  WEEKDAY_LABELS,
+  WEEKDAY_SHORT_LABELS,
+  MAX_ROOMS,
+  MAX_PROFESSIONALS,
+  MAX_CATEGORIES,
+} from "@/lib/constants";
 import type {
   WeekDay,
   Workspace,
@@ -19,7 +25,10 @@ import type {
   AvailabilitySlot,
 } from "@/types";
 
-function generateAllTimeOptions(): ReadonlyArray<{ value: string; label: string }> {
+function generateAllTimeOptions(): ReadonlyArray<{
+  value: string;
+  label: string;
+}> {
   const options: Array<{ value: string; label: string }> = [];
   for (let m = 0; m <= 23 * 60 + 30; m += 30) {
     const h = Math.floor(m / 60);
@@ -36,8 +45,8 @@ const DEFAULT_ACTIVITY_PRESETS: ReadonlyArray<string> = [
   "Psicoterapia Individual",
   "Acolhimento Inicial",
   "Acolhimento de Seguimento",
-  "Grupo Terapeutico",
-  "Consulta Medica",
+  "Grupo Terapêutico",
+  "Consulta Médica",
   "Atendimento de Enfermagem",
 ];
 
@@ -102,7 +111,8 @@ function StepDays({
     if (selected.includes(day)) {
       onChange(selected.filter((d) => d !== day));
     } else {
-      onChange([...selected, day]);
+      const updated = [...selected, day];
+      onChange(ALL_DAYS.filter((d) => updated.includes(d)));
     }
   };
 
@@ -161,9 +171,7 @@ function StepShifts({
   };
 
   const updateShift = (id: string, field: keyof ShiftDraft, value: string) => {
-    onChange(
-      shifts.map((s) => (s.id === id ? { ...s, [field]: value } : s))
-    );
+    onChange(shifts.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
   };
 
   return (
@@ -173,7 +181,10 @@ function StepShifts({
       </p>
       <div className="flex flex-col gap-3">
         {shifts.map((shift) => (
-          <Card key={shift.id} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <Card
+            key={shift.id}
+            className="flex flex-col gap-3 sm:flex-row sm:items-end"
+          >
             <div className="flex-1">
               <Input
                 label="Nome do turno"
@@ -184,7 +195,9 @@ function StepShifts({
             </div>
             <div className="flex gap-2 items-end">
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-text-primary">Início</label>
+                <label className="text-sm font-medium text-text-primary">
+                  Início
+                </label>
                 <Select
                   value={shift.startTime}
                   onChange={(v) => updateShift(shift.id, "startTime", v)}
@@ -192,7 +205,9 @@ function StepShifts({
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-text-primary">Fim</label>
+                <label className="text-sm font-medium text-text-primary">
+                  Fim
+                </label>
                 <Select
                   value={shift.endTime}
                   onChange={(v) => updateShift(shift.id, "endTime", v)}
@@ -229,7 +244,8 @@ function StepRooms({
   return (
     <div className="flex flex-col gap-4">
       <p className="text-text-secondary">
-        Quantas atividades podem ocorrer simultaneamente em cada turno? (máx. {MAX_ROOMS})
+        Quantas atividades podem ocorrer simultaneamente em cada turno? (máx.{" "}
+        {MAX_ROOMS})
       </p>
       <div className="flex items-center gap-4">
         <Button
@@ -278,7 +294,9 @@ function StepProfessionals({
   readonly categories: ReadonlyArray<Category>;
   readonly days: ReadonlyArray<WeekDay>;
   readonly shifts: ReadonlyArray<ShiftDraft>;
-  readonly onChangeProfessionals: (profs: ReadonlyArray<ProfessionalDraft>) => void;
+  readonly onChangeProfessionals: (
+    profs: ReadonlyArray<ProfessionalDraft>
+  ) => void;
   readonly onChangeCategories: (cats: ReadonlyArray<Category>) => void;
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -321,12 +339,15 @@ function StepProfessionals({
       );
     } else {
       const shift = shifts.find((s) => s.id === shiftId);
-      setDraftAvailability([...draftAvailability, {
-        day,
-        shiftId,
-        startTime: shift?.startTime ?? "07:00",
-        endTime: shift?.endTime ?? "12:00",
-      }]);
+      setDraftAvailability([
+        ...draftAvailability,
+        {
+          day,
+          shiftId,
+          startTime: shift?.startTime ?? "07:00",
+          endTime: shift?.endTime ?? "12:00",
+        },
+      ]);
     }
   };
 
@@ -486,35 +507,64 @@ function StepProfessionals({
               Disponibilidade
             </span>
             <div className="overflow-x-auto scrollbar-minimal">
-              <table className="text-sm">
+              <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    <th className="p-1 text-left text-text-secondary">Turno</th>
-                    {days.map((d) => (
-                      <th key={d} className="p-1 text-center text-text-secondary">
-                        📅 {WEEKDAY_LABELS[d].slice(0, 3)}
+                    <th className="p-1" />
+                    {shifts.map((shift) => (
+                      <th key={shift.id} className="p-1 text-center">
+                        <span className="text-xs font-medium text-text-secondary">
+                          🕐 {shift.label}
+                        </span>
                       </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {shifts.map((shift) => (
-                    <tr key={shift.id}>
-                      <td className="p-1 text-text-primary">🕐 {shift.label}</td>
-                      {days.map((day) => {
+                  {days.map((day) => (
+                    <tr key={day}>
+                      <td className="p-1">
+                        <span className="text-sm font-medium text-text-primary whitespace-nowrap">
+                          {WEEKDAY_SHORT_LABELS[day]}
+                        </span>
+                      </td>
+                      {shifts.map((shift) => {
                         const checked = draftAvailability.some(
                           (a) => a.day === day && a.shiftId === shift.id
                         );
                         return (
-                          <td key={`${day}-${shift.id}`} className="p-1 text-center">
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={() =>
-                                toggleAvailability(day, shift.id)
-                              }
-                              className="h-4 w-4 cursor-pointer accent-primary"
-                            />
+                          <td
+                            key={`${day}-${shift.id}`}
+                            className="p-1 text-center"
+                          >
+                            <button
+                              type="button"
+                              onClick={() => toggleAvailability(day, shift.id)}
+                              className={cn(
+                                "w-8 h-8 rounded-md border-2 transition-all duration-150 cursor-pointer flex items-center justify-center mx-auto",
+                                checked
+                                  ? "bg-primary border-primary text-white"
+                                  : "bg-surface border-border text-text-secondary hover:border-primary/50"
+                              )}
+                              aria-label={`${WEEKDAY_SHORT_LABELS[day]} - ${shift.label}`}
+                              aria-pressed={checked}
+                            >
+                              {checked && (
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="3"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                              )}
+                            </button>
                           </td>
                         );
                       })}
@@ -641,7 +691,9 @@ function PencilIcon() {
 
 export function SetupWizard({ onComplete, onCancel }: SetupWizardProps) {
   const [step, setStep] = useState(1);
-  const [slideDirection, setSlideDirection] = useState<"right" | "left">("right");
+  const [slideDirection, setSlideDirection] = useState<"right" | "left">(
+    "right"
+  );
   const [animKey, setAnimKey] = useState(0);
   const [name, setName] = useState("");
   const [days, setDays] = useState<ReadonlyArray<WeekDay>>(DEFAULT_DAYS);
@@ -701,7 +753,7 @@ export function SetupWizard({ onComplete, onCancel }: SetupWizardProps) {
     const workspace: Workspace = {
       id: generateId(),
       name: name.trim(),
-      days: [...days],
+      days: ALL_DAYS.filter((d) => days.includes(d)),
       shifts: finalShifts,
       roomsPerShift: roomCount,
       activityPresets: DEFAULT_ACTIVITY_PRESETS,
@@ -796,18 +848,11 @@ export function SetupWizard({ onComplete, onCancel }: SetupWizardProps) {
 
       {/* Navigation */}
       <div className="flex justify-between">
-        <Button
-          variant="ghost"
-          onClick={goBack}
-          disabled={step === 1}
-        >
+        <Button variant="ghost" onClick={goBack} disabled={step === 1}>
           Voltar
         </Button>
         {step < TOTAL_STEPS ? (
-          <Button
-            onClick={goNext}
-            disabled={!canAdvance()}
-          >
+          <Button onClick={goNext} disabled={!canAdvance()}>
             Próximo
           </Button>
         ) : (

@@ -27,14 +27,24 @@ export const DroppableShiftZone = React.memo(function DroppableShiftZone({
   const isRoomBeingDragged =
     activeDragItem !== null && activeDragItem.type === "room";
 
-  const isDisabled = isRoomBeingDragged && isOverCapacity;
+  const isAllocationBeingDragged =
+    activeDragItem !== null && activeDragItem.type === "allocation";
+
+  const isSameSourceZone =
+    isAllocationBeingDragged &&
+    activeDragItem.sourceDay === day &&
+    activeDragItem.sourceShiftId === shiftId;
+
+  const isDisabled =
+    (isRoomBeingDragged && isOverCapacity) || isSameSourceZone;
 
   const { setNodeRef, isOver } = useDroppable({
     id: droppableId,
     disabled: isDisabled,
   });
 
-  const isActiveTarget = isOver && isRoomBeingDragged && !isDisabled;
+  const isAcceptingDrag = isRoomBeingDragged || isAllocationBeingDragged;
+  const isActiveTarget = isOver && isAcceptingDrag && !isDisabled;
 
   return (
     <div
@@ -45,7 +55,7 @@ export const DroppableShiftZone = React.memo(function DroppableShiftZone({
           "opacity-50 cursor-not-allowed",
         isActiveTarget &&
           "ring-2 ring-primary ring-offset-2 ring-offset-surface bg-primary/10 scale-[1.01]",
-        isRoomBeingDragged && !isDisabled && !isActiveTarget &&
+        isAcceptingDrag && !isDisabled && !isActiveTarget &&
           "ring-1 ring-primary/40 ring-offset-1 ring-offset-surface bg-primary/5"
       )}
     >
@@ -70,7 +80,7 @@ export const DroppableShiftZone = React.memo(function DroppableShiftZone({
             <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
           </svg>
           <span className="text-xs font-medium text-error text-center px-2">
-            Todas as salas deste turno ja foram preenchidas
+            Todas as salas deste turno já foram preenchidas
           </span>
         </div>
       )}

@@ -18,10 +18,10 @@
 /* Dark theme — deep navy */
 [data-theme="dark"] {
   --color-surface: #1A1A2E;
-  --color-surface-card: #16213E;
+  --color-surface-card: #1C2A4A;
   --color-text-primary: #F3F4F6;
   --color-text-secondary: #9CA3AF;
-  --color-border: #2A2A4A;
+  --color-border: #334155;
   --color-primary: #34D399;
   --color-primary-light: #065F46;
   --color-primary-dark: #A7F3D0;

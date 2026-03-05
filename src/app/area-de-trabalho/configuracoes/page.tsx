@@ -200,7 +200,7 @@ export default function SettingsPage() {
         >
           {BACK_ICON}
         </button>
-        <h1 className="text-lg font-semibold text-text-primary">Configuracoes</h1>
+        <h1 className="text-lg font-semibold text-text-primary">Configurações</h1>
       </header>
 
       <div className="flex-1 overflow-y-auto scrollbar-minimal px-4 py-4 max-w-5xl mx-auto w-full">
@@ -287,7 +287,7 @@ export default function SettingsPage() {
                         />
                         <div className="flex gap-2">
                           <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs font-medium text-text-primary">Inicio</label>
+                            <label className="text-xs font-medium text-text-primary">Início</label>
                             <Select
                               value={shiftDraft.startTime}
                               onChange={(v) => setShiftDraft((d) => ({ ...d, startTime: v }))}
@@ -382,7 +382,7 @@ export default function SettingsPage() {
             <section className="flex flex-col gap-2">
               <h2 className="text-sm font-semibold text-text-primary">Salas por Turno</h2>
               <p className="text-xs text-text-secondary">
-                Numero maximo de atividades por turno em cada dia.
+                Número máximo de atividades por turno em cada dia.
               </p>
               <Select
                 value={String(workspace.roomsPerShift)}

@@ -21,6 +21,12 @@ interface UseScheduleReturn {
     activityLabel: string
   ) => void;
   readonly removeAllocation: (allocationId: string) => void;
+  readonly moveAllocation: (
+    allocationId: string,
+    targetDay: WeekDay,
+    targetShiftId: string,
+    filterProfessionalIds?: ReadonlyArray<string>
+  ) => void;
   readonly updateAllocationActivity: (
     allocationId: string,
     label: string
@@ -174,6 +180,36 @@ export function useSchedule({
     [updateWorkspace]
   );
 
+  const moveAllocation = useCallback(
+    (
+      allocationId: string,
+      targetDay: WeekDay,
+      targetShiftId: string,
+      filterProfessionalIds?: ReadonlyArray<string>
+    ) => {
+      updateWorkspace((prev) => ({
+        ...prev,
+        allocations: prev.allocations.map((a) => {
+          if (a.id !== allocationId) return a;
+          const filteredAssignments =
+            filterProfessionalIds != null
+              ? a.assignments.filter((assign) =>
+                  filterProfessionalIds.includes(assign.professionalId)
+                )
+              : a.assignments;
+          return {
+            ...a,
+            day: targetDay,
+            shiftId: targetShiftId,
+            assignments: filteredAssignments,
+          };
+        }),
+        updatedAt: new Date().toISOString(),
+      }));
+    },
+    [updateWorkspace]
+  );
+
   const getAllocationsForSlot = useCallback(
     (day: WeekDay, shiftId: string): ReadonlyArray<Allocation> => {
       return allocations.filter(
@@ -196,6 +232,7 @@ export function useSchedule({
     () => ({
       addAllocation,
       removeAllocation,
+      moveAllocation,
       updateAllocationActivity,
       addAssignment,
       removeAssignment,
@@ -206,6 +243,7 @@ export function useSchedule({
     [
       addAllocation,
       removeAllocation,
+      moveAllocation,
       updateAllocationActivity,
       addAssignment,
       removeAssignment,

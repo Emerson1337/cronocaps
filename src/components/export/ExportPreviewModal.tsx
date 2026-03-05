@@ -4,7 +4,6 @@ import { useState, useCallback } from "react";
 import { Modal, Button, Input, Badge } from "@/components/ui";
 import type { Workspace } from "@/types";
 import type { Conflict } from "@/features/validation/types";
-import { generateSchedulePdf } from "./pdf-generator";
 
 interface ExportPreviewModalProps {
   readonly open: boolean;
@@ -27,7 +26,8 @@ export function ExportPreviewModal({
 
     // Use a microtask to let the UI update before generating
     Promise.resolve()
-      .then(() => {
+      .then(() => import("./pdf-generator"))
+      .then(({ generateSchedulePdf }) => {
         generateSchedulePdf({
           workspace,
           conflicts: [...conflicts],

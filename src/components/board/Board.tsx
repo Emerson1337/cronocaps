@@ -1,7 +1,7 @@
 "use client";
 
 import { DayColumn } from "./DayColumn";
-import type { Allocation, Shift, WeekDay } from "@/types";
+import type { Allocation, Shift, WeekDay, Professional, Category } from "@/types";
 
 interface BoardProps {
   readonly days: ReadonlyArray<WeekDay>;
@@ -11,7 +11,13 @@ interface BoardProps {
   readonly onAllocationTap: (allocationId: string) => void;
   readonly onAllocationQuickAdd: (allocationId: string) => void;
   readonly onAllocationRemove: (allocationId: string) => void;
+  readonly onAllocationCopy?: ((allocationId: string) => void) | undefined;
+  readonly onPaste?: ((day: WeekDay, shiftId: string) => void) | undefined;
+  readonly hasClipboard?: boolean | undefined;
   readonly getConflictStyle: (allocationId: string) => string;
+  readonly showDetails?: boolean | undefined;
+  readonly professionals?: ReadonlyArray<Professional> | undefined;
+  readonly categories?: ReadonlyArray<Category> | undefined;
 }
 
 export function Board({
@@ -22,7 +28,13 @@ export function Board({
   onAllocationTap,
   onAllocationQuickAdd,
   onAllocationRemove,
+  onAllocationCopy,
+  onPaste,
+  hasClipboard,
   getConflictStyle,
+  showDetails,
+  professionals,
+  categories,
 }: BoardProps) {
   return (
     <div className="flex-1 overflow-auto scrollbar-minimal">
@@ -40,7 +52,13 @@ export function Board({
             onAllocationTap={onAllocationTap}
             onAllocationQuickAdd={onAllocationQuickAdd}
             onAllocationRemove={onAllocationRemove}
+            onAllocationCopy={onAllocationCopy}
+            onPaste={onPaste}
+            hasClipboard={hasClipboard}
             getConflictStyle={getConflictStyle}
+            showDetails={showDetails}
+            professionals={professionals}
+            categories={categories}
           />
         ))}
       </div>

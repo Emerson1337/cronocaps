@@ -2,7 +2,6 @@
 
 import { useMemo, useState, useCallback } from "react";
 import { Modal, Button, Input } from "@/components/ui";
-import { cn } from "@/lib/utils";
 import type { Professional, Category, Allocation, WeekDay } from "@/types";
 
 interface AddProfessionalPickerProps {
@@ -50,9 +49,13 @@ export function AddProfessionalPicker({
 
   const availableProfessionals = useMemo(() => {
     return professionals.filter(
-      (p) => !assignedProfessionalIds.has(p.id)
+      (p) =>
+        !assignedProfessionalIds.has(p.id) &&
+        p.availability.some(
+          (slot) => slot.day === day && slot.shiftId === shiftId
+        )
     );
-  }, [professionals, assignedProfessionalIds]);
+  }, [professionals, assignedProfessionalIds, day, shiftId]);
 
   const filteredProfessionals = useMemo(() => {
     const term = search.toLowerCase().trim();
@@ -105,25 +108,19 @@ export function AddProfessionalPicker({
           {filteredProfessionals.length === 0 ? (
             <p className="text-sm text-text-secondary text-center py-4">
               {availableProfessionals.length === 0
-                ? "Todos os profissionais já estão alocados neste turno."
+                ? "Nenhum profissional disponível para este turno."
                 : "Nenhum profissional encontrado."}
             </p>
           ) : (
             filteredProfessionals.map((professional) => {
               const category = categoryMap.get(professional.categoryId);
-              const isAvailableForSlot = professional.availability.some(
-                (slot) => slot.day === day && slot.shiftId === shiftId
-              );
 
               return (
                 <Button
                   key={professional.id}
                   variant="ghost"
                   onClick={() => handleSelect(professional.id)}
-                  className={cn(
-                    "flex items-center gap-2 justify-start text-left w-full min-h-[44px] px-3 py-2",
-                    isAvailableForSlot && "bg-primary-light/30"
-                  )}
+                  className="flex items-center gap-2 justify-start text-left w-full min-h-[44px] px-3 py-2"
                 >
                   <span
                     className="inline-block h-3 w-3 rounded-full shrink-0"
@@ -136,7 +133,6 @@ export function AddProfessionalPicker({
                     </span>
                     <span className="text-xs text-text-secondary truncate">
                       {category?.name ?? "Sem categoria"}
-                      {isAvailableForSlot ? " · Disponível" : ""}
                     </span>
                   </span>
                 </Button>

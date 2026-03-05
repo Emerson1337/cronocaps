@@ -2,6 +2,7 @@ export type {
   DragItemType,
   RoomDragData,
   ProfessionalDragData,
+  AllocationDragData,
   DragData,
 } from "./types";
 export {
@@ -17,6 +18,7 @@ export { DraggableRoom } from "./DraggableRoom";
 export { DraggableProfessional } from "./DraggableProfessional";
 export { DroppableShiftZone } from "./DroppableShiftZone";
 export { DroppableRoomTarget } from "./DroppableRoomTarget";
+export { DraggableAllocation } from "./DraggableAllocation";
 export { TimePicker } from "./TimePicker";
 
 export {

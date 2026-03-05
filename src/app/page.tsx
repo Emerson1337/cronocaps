@@ -79,7 +79,7 @@ export default function HomePage() {
               Escolha um Modelo
             </h1>
             <p className="mt-2 text-text-secondary">
-              Selecione o tipo de CAPS para comecar com uma configuracao pre-definida.
+              Selecione o tipo de CAPS para começar com uma configuração pré-definida.
             </p>
           </div>
 
@@ -157,7 +157,7 @@ export default function HomePage() {
                 Criar a partir de Modelo
               </h2>
               <p className="text-sm text-text-secondary">
-                Comece com um modelo pre-configurado com turnos e
+                Comece com um modelo pré-configurado com turnos e
                 profissionais de exemplo.
               </p>
             </div>
@@ -208,7 +208,7 @@ export default function HomePage() {
                   </Button>
                 </div>
                 <p className="text-sm text-text-secondary">
-                  Retomar o espaco de trabalho &ldquo;{workspace.name}&rdquo;.
+                  Retomar o espaço de trabalho &ldquo;{workspace.name}&rdquo;.
                 </p>
               </div>
             </Card>
