@@ -122,10 +122,7 @@ export function RoomDetailPanel({
   }, [workspace.categories]);
 
   const professionalMap = useMemo(() => {
-    const map = new Map<
-      string,
-      { name: string; categoryId: string }
-    >();
+    const map = new Map<string, { name: string; categoryId: string }>();
     for (const p of workspace.professionals) {
       map.set(p.id, { name: p.name, categoryId: p.categoryId });
     }
@@ -217,7 +214,12 @@ export function RoomDetailPanel({
       if (allocationId === null) return;
 
       if (timePickerState.mode === "add" && pendingAddProfessionalId !== null) {
-        onAddAssignment(allocationId, pendingAddProfessionalId, startTime, endTime);
+        onAddAssignment(
+          allocationId,
+          pendingAddProfessionalId,
+          startTime,
+          endTime
+        );
         setPendingAddProfessionalId(null);
       } else if (timePickerState.mode === "edit") {
         onUpdateAssignment(
@@ -286,7 +288,7 @@ export function RoomDetailPanel({
       {/* Backdrop */}
       <div
         className={cn(
-          "fixed inset-0 z-40 bg-black/50 transition-opacity duration-200",
+          "fixed inset-0 z-60 bg-black/50 transition-opacity duration-200",
           isVisible ? "opacity-100" : "opacity-0"
         )}
         onClick={handleBackdropClick}
@@ -381,7 +383,8 @@ export function RoomDetailPanel({
                 ? categoryMap.get(professional.categoryId)
                 : undefined;
 
-              const staggerStyle: React.CSSProperties & Record<string, unknown> = {
+              const staggerStyle: React.CSSProperties &
+                Record<string, unknown> = {
                 "--stagger-index": index,
               };
 
@@ -391,21 +394,21 @@ export function RoomDetailPanel({
                   className="animate-stagger-fade-in"
                   style={staggerStyle}
                 >
-                <ProfessionalEntry
-                  professionalName={
-                    professional?.name ?? "Profissional desconhecido"
-                  }
-                  categoryName={category?.name ?? "Sem categoria"}
-                  categoryColor={category?.color ?? "#999"}
-                  startTime={assignment.startTime}
-                  endTime={assignment.endTime}
-                  onEdit={() =>
-                    handleEditProfessionalTime(assignment.professionalId)
-                  }
-                  onRemove={() =>
-                    handleRemoveProfessional(assignment.professionalId)
-                  }
-                />
+                  <ProfessionalEntry
+                    professionalName={
+                      professional?.name ?? "Profissional desconhecido"
+                    }
+                    categoryName={category?.name ?? "Sem categoria"}
+                    categoryColor={category?.color ?? "#999"}
+                    startTime={assignment.startTime}
+                    endTime={assignment.endTime}
+                    onEdit={() =>
+                      handleEditProfessionalTime(assignment.professionalId)
+                    }
+                    onRemove={() =>
+                      handleRemoveProfessional(assignment.professionalId)
+                    }
+                  />
                 </div>
               );
             })

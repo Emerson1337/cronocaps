@@ -19,7 +19,11 @@ const CONFLICT_TYPE_LABELS: Record<string, string> = {
   INITIAL_AND_FOLLOWUP_CONFLICT: "Conflito de atividade",
 };
 
-export function ConflictSummaryPanel({ open, onClose, conflicts }: ConflictSummaryPanelProps) {
+export function ConflictSummaryPanel({
+  open,
+  onClose,
+  conflicts,
+}: ConflictSummaryPanelProps) {
   if (!open) return null;
 
   const errorCount = conflicts.filter((c) => c.severity === "error").length;
@@ -28,7 +32,7 @@ export function ConflictSummaryPanel({ open, onClose, conflicts }: ConflictSumma
   return (
     <div
       className={cn(
-        "fixed inset-y-0 right-0 z-40 flex w-80 flex-col border-l border-border bg-surface-card shadow-lg",
+        "fixed inset-y-0 right-0 z-60 flex w-80 flex-col border-l border-border bg-surface-card shadow-lg",
         "animate-slide-in-right"
       )}
     >
@@ -43,10 +47,14 @@ export function ConflictSummaryPanel({ open, onClose, conflicts }: ConflictSumma
 
       <div className="flex items-center gap-2 px-4 py-2 border-b border-border">
         {errorCount > 0 && (
-          <Badge variant="error">{String(errorCount)} erro{errorCount === 1 ? "" : "s"}</Badge>
+          <Badge variant="error">
+            {String(errorCount)} erro{errorCount === 1 ? "" : "s"}
+          </Badge>
         )}
         {warningCount > 0 && (
-          <Badge variant="warning">{String(warningCount)} aviso{warningCount === 1 ? "" : "s"}</Badge>
+          <Badge variant="warning">
+            {String(warningCount)} aviso{warningCount === 1 ? "" : "s"}
+          </Badge>
         )}
       </div>
 
@@ -62,21 +70,29 @@ export function ConflictSummaryPanel({ open, onClose, conflicts }: ConflictSumma
                 key={conflict.id}
                 className={cn(
                   "flex items-start gap-2 rounded-lg p-3 text-sm",
-                  conflict.severity === "error"
-                    ? "bg-error/5"
-                    : "bg-warning/5"
+                  conflict.severity === "error" ? "bg-error/5" : "bg-warning/5"
                 )}
               >
                 {conflict.severity === "error" ? (
-                  <AlertCircle size={16} className="mt-0.5 shrink-0 text-error" aria-hidden="true" />
+                  <AlertCircle
+                    size={16}
+                    className="mt-0.5 shrink-0 text-error"
+                    aria-hidden="true"
+                  />
                 ) : (
-                  <AlertTriangle size={16} className="mt-0.5 shrink-0 text-warning" aria-hidden="true" />
+                  <AlertTriangle
+                    size={16}
+                    className="mt-0.5 shrink-0 text-warning"
+                    aria-hidden="true"
+                  />
                 )}
                 <div className="flex flex-col gap-0.5 min-w-0">
                   <span className="text-xs font-medium text-text-secondary">
                     {CONFLICT_TYPE_LABELS[conflict.type] ?? conflict.type}
                   </span>
-                  <span className="text-sm text-text-primary">{conflict.message}</span>
+                  <span className="text-sm text-text-primary">
+                    {conflict.message}
+                  </span>
                 </div>
               </li>
             ))}
