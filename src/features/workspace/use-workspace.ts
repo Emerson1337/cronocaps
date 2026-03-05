@@ -96,6 +96,15 @@ export function useWorkspace(): UseWorkspaceReturn {
       const nextValue =
         typeof updater === "function" ? updater(pendingValueRef.current ?? stored) : updater;
 
+      // Direct value (not a function updater) — flush to localStorage immediately
+      // so navigation to another page can read it right away.
+      if (typeof updater !== "function") {
+        pendingValueRef.current = null;
+        setPendingValue(null);
+        setStored(nextValue);
+        return;
+      }
+
       pendingValueRef.current = nextValue;
       setPendingValue(nextValue);
 
