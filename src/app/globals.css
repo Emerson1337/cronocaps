@@ -1,26 +1,337 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Light theme (default) — warm Excalidraw-inspired */
+[data-theme="light"] {
+  --color-surface: #FFF8F0;
+  --color-surface-card: #FFF1E6;
+  --color-text-primary: #1F2937;
+  --color-text-secondary: #6B7280;
+  --color-border: #E5D5C5;
+  --color-primary: #10B981;
+  --color-primary-light: #D1FAE5;
+  --color-primary-dark: #047857;
+  --color-accent: #38BDF8;
+  --color-warning: #FBBF24;
+  --color-error: #EF4444;
+}
+
+/* Dark theme — deep navy */
+[data-theme="dark"] {
+  --color-surface: #1A1A2E;
+  --color-surface-card: #16213E;
+  --color-text-primary: #F3F4F6;
+  --color-text-secondary: #9CA3AF;
+  --color-border: #2A2A4A;
+  --color-primary: #34D399;
+  --color-primary-light: #065F46;
+  --color-primary-dark: #A7F3D0;
+  --color-accent: #38BDF8;
+  --color-warning: #FBBF24;
+  --color-error: #F87171;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--color-surface);
+  --color-surface-card: var(--color-surface-card);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-border: var(--color-border);
+  --color-primary: var(--color-primary);
+  --color-primary-light: var(--color-primary-light);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-accent: var(--color-accent);
+  --color-warning: var(--color-warning);
+  --color-error: var(--color-error);
+  --font-sans: var(--font-inter);
+  --font-hand: var(--font-caveat);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  transition-property: background-color, color, border-color;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  min-height: 100dvh;
+  /* Excalidraw-style dot-grid background */
+  background-image: radial-gradient(circle, var(--color-border) 0.8px, transparent 0.8px);
+  background-size: 24px 24px;
+}
+
+/* ── Scrollbar hide utility ── */
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Minimalist scrollbar (visible on hover) ── */
+
+.scrollbar-minimal {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.scrollbar-minimal:hover {
+  scrollbar-color: var(--color-border) transparent;
+}
+.scrollbar-minimal::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.scrollbar-minimal::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-minimal::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 9999px;
+}
+.scrollbar-minimal:hover::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+}
+.scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+
+/* ── Dialog hidden for drag (keeps DOM mounted in top layer) ── */
+
+dialog.dialog-hidden-for-drag {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+dialog.dialog-hidden-for-drag::backdrop {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ── Keyframes ── */
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes drop-zone-pulse {
+  0%,
+  100% {
+    border-color: var(--color-primary);
+    opacity: 1;
+  }
+  50% {
+    border-color: var(--color-primary-light);
+    opacity: 0.7;
+  }
+}
+
+@keyframes invalid-drop-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes conflict-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes empty-zone-breathe {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes modal-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modal-backdrop-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes step-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes step-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── Utility classes ── */
+
+.animate-slide-up {
+  animation: slide-up 200ms ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 200ms ease-out both;
+}
+
+.animate-drop-zone-pulse {
+  animation: drop-zone-pulse 1.5s ease-in-out infinite;
+}
+
+.animate-invalid-drop-shake {
+  animation: invalid-drop-shake 200ms ease-out;
+}
+
+.animate-conflict-pulse {
+  animation: conflict-pulse 2s ease-in-out infinite;
+}
+
+.animate-empty-zone-breathe {
+  animation: empty-zone-breathe 3s ease-in-out infinite;
+}
+
+.animate-modal-slide-up {
+  animation: modal-slide-up 250ms cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+
+.animate-modal-backdrop-fade {
+  animation: modal-backdrop-fade 200ms ease-out both;
+}
+
+.animate-step-slide-in-right {
+  animation: step-slide-in-right 300ms cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+
+.animate-step-slide-in-left {
+  animation: step-slide-in-left 300ms cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+
+/* Staggered fade-in for children (use with inline --stagger-index) */
+.animate-stagger-fade-in {
+  opacity: 0;
+  animation: fade-in 200ms ease-out both;
+  animation-delay: calc(var(--stagger-index, 0) * 50ms);
+}
+
+/* ── Resource tray hover effects (desktop) ── */
+
+@media (hover: hover) {
+  .hover-lift {
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* ── Button press feedback ── */
+
+.press-scale:active {
+  transform: scale(0.97);
+  transition: transform 100ms ease-out;
+}
+
+/* ── Focus ring for accessibility ── */
+
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-primary);
+}
+
+/* ── Reduced motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-drop-zone-pulse,
+  .animate-invalid-drop-shake,
+  .animate-conflict-pulse,
+  .animate-empty-zone-breathe,
+  .animate-modal-slide-up,
+  .animate-modal-backdrop-fade,
+  .animate-stagger-fade-in,
+  .animate-step-slide-in-right,
+  .animate-step-slide-in-left {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .hover-lift:hover {
+    transform: none !important;
+  }
+
+  .press-scale:active {
+    transform: none !important;
+  }
 }
