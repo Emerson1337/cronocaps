@@ -13,7 +13,7 @@ interface BadgeProps {
 const variantStyles: Record<BadgeVariant, string> = {
   default: "bg-primary-light text-primary-dark",
   outline: "border border-border text-text-secondary",
-  warning: "bg-warning/20 text-warning",
+  warning: "bg-warning/20 text-warning-dark",
   error: "bg-error/20 text-error",
   custom: "",
 };
