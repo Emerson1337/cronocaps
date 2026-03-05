@@ -27,6 +27,19 @@ export function AddProfessionalPicker({
 }: AddProfessionalPickerProps) {
   const [search, setSearch] = useState("");
 
+  const roomCountMap = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const allocation of allocations) {
+      for (const assignment of allocation.assignments) {
+        counts.set(
+          assignment.professionalId,
+          (counts.get(assignment.professionalId) ?? 0) + 1
+        );
+      }
+    }
+    return counts;
+  }, [allocations]);
+
   const assignedProfessionalIds = useMemo(() => {
     const ids = new Set<string>();
     for (const allocation of allocations) {
@@ -128,8 +141,18 @@ export function AddProfessionalPicker({
                     aria-hidden="true"
                   />
                   <span className="flex flex-col flex-1 min-w-0">
-                    <span className="text-sm font-medium text-text-primary truncate">
-                      {professional.name}
+                    <span className="flex items-center gap-1.5">
+                      <span className="text-sm font-medium text-text-primary truncate">
+                        {professional.name}
+                      </span>
+                      {(roomCountMap.get(professional.id) ?? 0) > 0 && (
+                        <span className="shrink-0 text-[10px] text-text-secondary bg-surface rounded-full px-1.5 py-0.5 leading-none">
+                          {roomCountMap.get(professional.id)}{" "}
+                          {roomCountMap.get(professional.id) === 1
+                            ? "sala"
+                            : "salas"}
+                        </span>
+                      )}
                     </span>
                     <span className="text-xs text-text-secondary truncate">
                       {category?.name ?? "Sem categoria"}

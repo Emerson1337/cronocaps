@@ -63,6 +63,7 @@ export function ResourceIcons({ workspace }: ResourceIconsProps) {
         onClose={() => setPeoplePickerOpen(false)}
         professionals={workspace.professionals}
         categories={workspace.categories}
+        allocations={workspace.allocations}
       />
     </>
   );

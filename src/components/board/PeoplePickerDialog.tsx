@@ -5,13 +5,14 @@ import { cn } from "@/lib/utils";
 import { Modal, Input } from "@/components/ui";
 import { DraggableProfessional } from "@/components/dnd/DraggableProfessional";
 import { useDndState } from "@/components/dnd/DndProvider";
-import type { Category, Professional } from "@/types";
+import type { Allocation, Category, Professional } from "@/types";
 
 interface PeoplePickerDialogProps {
   readonly open: boolean;
   readonly onClose: () => void;
   readonly professionals: ReadonlyArray<Professional>;
   readonly categories: ReadonlyArray<Category>;
+  readonly allocations: ReadonlyArray<Allocation>;
 }
 
 export function PeoplePickerDialog({
@@ -19,6 +20,7 @@ export function PeoplePickerDialog({
   onClose,
   professionals,
   categories,
+  allocations,
 }: PeoplePickerDialogProps) {
   const [search, setSearch] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
@@ -27,6 +29,19 @@ export function PeoplePickerDialog({
   const { activeDragItem } = useDndState();
 
   const isDragging = activeDragItem !== null && activeDragItem.type === "professional";
+
+  const roomCountMap = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const allocation of allocations) {
+      for (const assignment of allocation.assignments) {
+        counts.set(
+          assignment.professionalId,
+          (counts.get(assignment.professionalId) ?? 0) + 1
+        );
+      }
+    }
+    return counts;
+  }, [allocations]);
 
   const filtered = useMemo(() => {
     let result = professionals;
@@ -125,8 +140,18 @@ export function PeoplePickerDialog({
                       : "bg-gray-400"
                   )}
                 />
-                <span className="flex-1 min-w-0 text-sm font-medium text-text-primary truncate">
-                  {professional.name}
+                <span className="flex-1 min-w-0 flex items-center gap-1.5">
+                  <span className="text-sm font-medium text-text-primary truncate">
+                    {professional.name}
+                  </span>
+                  {(roomCountMap.get(professional.id) ?? 0) > 0 && (
+                    <span className="shrink-0 text-[10px] text-text-secondary bg-surface rounded-full px-1.5 py-0.5 leading-none">
+                      {roomCountMap.get(professional.id)}{" "}
+                      {roomCountMap.get(professional.id) === 1
+                        ? "sala"
+                        : "salas"}
+                    </span>
+                  )}
                 </span>
                 <span
                   className="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium text-white"
