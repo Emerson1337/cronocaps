@@ -3,12 +3,18 @@ import { DEFAULT_WEEKDAYS } from "@/lib/constants";
 import type { Workspace, Category, Professional, Shift } from "@/types";
 
 const DEFAULT_ACTIVITY_PRESETS: ReadonlyArray<string> = [
-  "Psicoterapia Individual",
-  "Acolhimento Inicial",
-  "Acolhimento de Seguimento",
-  "Grupo Terapêutico",
-  "Consulta Médica",
-  "Atendimento de Enfermagem",
+  "Sala de Acolhimento Inicial",
+  "Sala de Acolhimento de Seguimento",
+  "Sala de Psicoterapia",
+  "Sala de Atendimento Social",
+  "Sala de Atendimento de Enfermagem / Regulação U.D",
+  "Sala de Consulta Médica",
+  "Sala de Matriciamento",
+  "Sala de Atendimento",
+  "Sala de Grupo",
+  "Sala de Enfermagem",
+  "Sala de Grupos",
+  "Sala de Plantão Psicológico",
 ];
 
 export function createCapsTemplate(): Workspace {
@@ -28,103 +34,49 @@ export function createCapsTemplate(): Workspace {
 
   const shifts: ReadonlyArray<Shift> = [shiftManha, shiftTarde];
 
-  const catPsicologo: Category = { id: generateId(), name: "Psicólogo(a)", color: "#10B981" };
   const catEnfermeiro: Category = { id: generateId(), name: "Enfermeiro(a)", color: "#3B82F6" };
-  const catAssistente: Category = { id: generateId(), name: "Assistente Social", color: "#8B5CF6" };
-  const catMedico: Category = { id: generateId(), name: "Médico(a) Psiquiatra", color: "#EF4444" };
+  const catPsicologo: Category = { id: generateId(), name: "Psicólogo(a)", color: "#10B981" };
   const catTerapeuta: Category = { id: generateId(), name: "Terapeuta Ocupacional", color: "#F59E0B" };
+  const catAssistente: Category = { id: generateId(), name: "Assistente Social", color: "#8B5CF6" };
+  const catMedico: Category = { id: generateId(), name: "Médico(a)", color: "#EF4444" };
 
   const categories: ReadonlyArray<Category> = [
-    catPsicologo,
     catEnfermeiro,
+    catPsicologo,
+    catTerapeuta,
     catAssistente,
     catMedico,
-    catTerapeuta,
   ];
 
   const days = DEFAULT_WEEKDAYS;
+  const allSlots = days.flatMap((day) => shifts.map((s) => ({ day, shiftId: s.id })));
 
   const professionals: ReadonlyArray<Professional> = [
-    {
-      id: generateId(),
-      name: "Ana Silva",
-      categoryId: catPsicologo.id,
-      availability: days.flatMap((day) =>
-        shifts.map((s) => ({ day, shiftId: s.id }))
-      ),
-    },
-    {
-      id: generateId(),
-      name: "Carlos Oliveira",
-      categoryId: catPsicologo.id,
-      availability: days.flatMap((day) =>
-        [shiftManha].map((s) => ({ day, shiftId: s.id }))
-      ),
-    },
-    {
-      id: generateId(),
-      name: "Mariana Costa",
-      categoryId: catPsicologo.id,
-      availability: days.flatMap((day) =>
-        [shiftTarde].map((s) => ({ day, shiftId: s.id }))
-      ),
-    },
-    {
-      id: generateId(),
-      name: "Ricardo Santos",
-      categoryId: catPsicologo.id,
-      availability: days.slice(0, 3).flatMap((day) =>
-        shifts.map((s) => ({ day, shiftId: s.id }))
-      ),
-    },
-    {
-      id: generateId(),
-      name: "Fernanda Lima",
-      categoryId: catEnfermeiro.id,
-      availability: days.flatMap((day) =>
-        shifts.map((s) => ({ day, shiftId: s.id }))
-      ),
-    },
-    {
-      id: generateId(),
-      name: "Paulo Mendes",
-      categoryId: catEnfermeiro.id,
-      availability: days.flatMap((day) =>
-        [shiftManha].map((s) => ({ day, shiftId: s.id }))
-      ),
-    },
-    {
-      id: generateId(),
-      name: "Juliana Ferreira",
-      categoryId: catAssistente.id,
-      availability: days.flatMap((day) =>
-        shifts.map((s) => ({ day, shiftId: s.id }))
-      ),
-    },
-    {
-      id: generateId(),
-      name: "Roberto Almeida",
-      categoryId: catAssistente.id,
-      availability: days.slice(0, 3).flatMap((day) =>
-        [shiftTarde].map((s) => ({ day, shiftId: s.id }))
-      ),
-    },
-    {
-      id: generateId(),
-      name: "Dr. Marcos Pereira",
-      categoryId: catMedico.id,
-      availability: days.slice(0, 3).flatMap((day) =>
-        [shiftManha].map((s) => ({ day, shiftId: s.id }))
-      ),
-    },
-    {
-      id: generateId(),
-      name: "Camila Rocha",
-      categoryId: catTerapeuta.id,
-      availability: days.flatMap((day) =>
-        [shiftTarde].map((s) => ({ day, shiftId: s.id }))
-      ),
-    },
+    // Enfermeiras
+    { id: generateId(), name: "Aglay Galvão", categoryId: catEnfermeiro.id, availability: allSlots },
+    { id: generateId(), name: "Emília Caminha", categoryId: catEnfermeiro.id, availability: allSlots },
+    { id: generateId(), name: "Thaís Jormanna", categoryId: catEnfermeiro.id, availability: allSlots },
+    { id: generateId(), name: "Vilma Leal", categoryId: catEnfermeiro.id, availability: allSlots },
+    // Psicólogas
+    { id: generateId(), name: "Adrielle Maia", categoryId: catPsicologo.id, availability: allSlots },
+    { id: generateId(), name: "Milena Lima", categoryId: catPsicologo.id, availability: allSlots },
+    { id: generateId(), name: "Marília Garcia", categoryId: catPsicologo.id, availability: allSlots },
+    { id: generateId(), name: "Lorena Ximenes", categoryId: catPsicologo.id, availability: allSlots },
+    // Terapeutas Ocupacionais
+    { id: generateId(), name: "Bruna Gurgel", categoryId: catTerapeuta.id, availability: allSlots },
+    { id: generateId(), name: "Andrea Cavalcante", categoryId: catTerapeuta.id, availability: allSlots },
+    { id: generateId(), name: "Lis Lavor", categoryId: catTerapeuta.id, availability: allSlots },
+    { id: generateId(), name: "Karol Brandão", categoryId: catTerapeuta.id, availability: allSlots },
+    { id: generateId(), name: "Ana Paula Simões", categoryId: catTerapeuta.id, availability: allSlots },
+    // Assistentes Sociais
+    { id: generateId(), name: "Priscilla Leite", categoryId: catAssistente.id, availability: allSlots },
+    { id: generateId(), name: "Mércia Lucas", categoryId: catAssistente.id, availability: allSlots },
+    { id: generateId(), name: "Káthia Kelly", categoryId: catAssistente.id, availability: allSlots },
+    { id: generateId(), name: "Karla Vanessa", categoryId: catAssistente.id, availability: allSlots },
+    { id: generateId(), name: "Liliana Correia", categoryId: catAssistente.id, availability: allSlots },
+    // Médicos
+    { id: generateId(), name: "Douglas Stélio", categoryId: catMedico.id, availability: allSlots },
+    { id: generateId(), name: "Brenda Muniz", categoryId: catMedico.id, availability: allSlots },
   ];
 
   const now = new Date().toISOString();

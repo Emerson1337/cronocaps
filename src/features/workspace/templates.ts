@@ -75,34 +75,55 @@ function createCapsAD(): Workspace {
     { label: "Tarde", start: "13:00", end: "17:00" },
   ]) as [Shift, Shift];
   const shifts = [manha, tarde];
-  const [psi, enf, ass, med, to, rd] = makeCategories([
-    { name: "Psicólogo(a)", color: "#10B981" },
+  const [enf, psi, to, ass, med] = makeCategories([
     { name: "Enfermeiro(a)", color: "#3B82F6" },
+    { name: "Psicólogo(a)", color: "#10B981" },
+    { name: "Terapeuta Ocupacional", color: "#F59E0B" },
     { name: "Assistente Social", color: "#8B5CF6" },
     { name: "Médico(a)", color: "#EF4444" },
-    { name: "Terapeuta Ocupacional", color: "#F59E0B" },
-    { name: "Redutor(a) de Danos", color: "#F97316" },
-  ]) as [Category, Category, Category, Category, Category, Category];
-  const cats = [psi, enf, ass, med, to, rd];
+  ]) as [Category, Category, Category, Category, Category];
+  const cats = [enf, psi, to, ass, med];
   const days = DEFAULT_WEEKDAYS;
   const adPresets = [
-    "Acolhimento Inicial",
-    "Grupo Terapêutico",
-    "Grupo de Prevenção à Recaída",
-    "Atendimento Individual",
-    "Oficina Terapêutica",
-    "Consulta Médica",
-    "Redução de Danos",
-    "Atendimento Familiar",
+    "Sala de Acolhimento Inicial",
+    "Sala de Acolhimento de Seguimento",
+    "Sala de Psicoterapia",
+    "Sala de Atendimento Social",
+    "Sala de Atendimento de Enfermagem / Regulação U.D",
+    "Sala de Consulta Médica",
+    "Sala de Matriciamento",
+    "Sala de Atendimento",
+    "Sala de Grupo",
+    "Sala de Enfermagem",
+    "Sala de Grupos",
+    "Sala de Plantão Psicológico",
   ];
   const pros = [
-    makeProfessional("Ana Silva", psi.id, days, shifts),
-    makeProfessional("Carlos Oliveira", psi.id, days, [manha]),
-    makeProfessional("Fernanda Lima", enf.id, days, shifts),
-    makeProfessional("Juliana Ferreira", ass.id, days, shifts),
-    makeProfessional("Dr. Marcos Pereira", med.id, days.slice(0, 3), [manha]),
-    makeProfessional("Camila Rocha", to.id, days, [tarde]),
-    makeProfessional("Diego Santos", rd.id, days, shifts),
+    // Enfermeiras
+    makeProfessional("Aglay Galvão", enf.id, days, shifts),
+    makeProfessional("Emília Caminha", enf.id, days, shifts),
+    makeProfessional("Thaís Jormanna", enf.id, days, shifts),
+    makeProfessional("Vilma Leal", enf.id, days, shifts),
+    // Psicólogas
+    makeProfessional("Adrielle Maia", psi.id, days, shifts),
+    makeProfessional("Milena Lima", psi.id, days, shifts),
+    makeProfessional("Marília Garcia", psi.id, days, shifts),
+    makeProfessional("Lorena Ximenes", psi.id, days, shifts),
+    // Terapeutas Ocupacionais
+    makeProfessional("Bruna Gurgel", to.id, days, shifts),
+    makeProfessional("Andrea Cavalcante", to.id, days, shifts),
+    makeProfessional("Lis Lavor", to.id, days, shifts),
+    makeProfessional("Karol Brandão", to.id, days, shifts),
+    makeProfessional("Ana Paula Simões", to.id, days, shifts),
+    // Assistentes Sociais
+    makeProfessional("Priscilla Leite", ass.id, days, shifts),
+    makeProfessional("Mércia Lucas", ass.id, days, shifts),
+    makeProfessional("Káthia Kelly", ass.id, days, shifts),
+    makeProfessional("Karla Vanessa", ass.id, days, shifts),
+    makeProfessional("Liliana Correia", ass.id, days, shifts),
+    // Médicos
+    makeProfessional("Douglas Stélio", med.id, days, shifts),
+    makeProfessional("Brenda Muniz", med.id, days, shifts),
   ];
   return buildWorkspace("CAPS AD", days, shifts, 5, cats, pros, adPresets);
 }
@@ -113,7 +134,7 @@ export const TEMPLATES: ReadonlyArray<TemplateInfo> = [
     name: "CAPS AD",
     description:
       "Especializado em álcool e outras drogas. Inclui redução de danos e prevenção à recaída.",
-    tags: ["Álcool e drogas", "2 turnos", "7 profissionais"],
+    tags: ["Álcool e drogas", "2 turnos", "20 profissionais"],
     create: createCapsAD,
   },
 ];
