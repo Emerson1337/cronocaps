@@ -226,26 +226,32 @@ export default function SettingsPage() {
                 {professionals.map((p) => (
                   <div
                     key={p.id}
-                    className="rounded-lg border border-border bg-surface-card px-2 py-1.5 flex items-center gap-2 min-h-[36px]"
+                    className="rounded-lg border border-border bg-surface-card px-2 py-1.5 flex flex-col gap-1"
                   >
-                    <span className="flex-1 text-sm font-medium text-text-primary truncate">
-                      {p.name}
-                    </span>
-                    <span
-                      className="text-xs px-2 py-0.5 rounded-full text-white shrink-0"
-                      style={{ backgroundColor: getCategoryColor(p.categoryId) }}
-                    >
-                      {getCategoryName(p.categoryId)}
-                    </span>
-                    <span className="text-xs text-text-secondary shrink-0">
-                      {p.availability.length} {p.availability.length === 1 ? "slot" : "slots"}
-                    </span>
-                    <IconButton label="Editar profissional" onClick={() => handleEditProfessional(p)}>
-                      {EDIT_ICON}
-                    </IconButton>
-                    <IconButton label="Remover profissional" variant="danger" onClick={() => setDeletingProfessional(p)}>
-                      {DELETE_ICON}
-                    </IconButton>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium text-text-primary">
+                        {p.name}
+                      </span>
+                      <span
+                        className="text-xs px-2 py-0.5 rounded-full text-white shrink-0"
+                        style={{ backgroundColor: getCategoryColor(p.categoryId) }}
+                      >
+                        {getCategoryName(p.categoryId)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs text-text-secondary">
+                        {p.availability.length} {p.availability.length === 1 ? "slot" : "slots"}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <IconButton label="Editar profissional" onClick={() => handleEditProfessional(p)}>
+                          {EDIT_ICON}
+                        </IconButton>
+                        <IconButton label="Remover profissional" variant="danger" onClick={() => setDeletingProfessional(p)}>
+                          {DELETE_ICON}
+                        </IconButton>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
