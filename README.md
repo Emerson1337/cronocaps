@@ -1,4 +1,8 @@
-# CronoCaps
+<p align="center">
+  <img src="public/logo.svg" alt="CronoCaps logo" width="80" />
+</p>
+
+<h1 align="center">CronoCaps</h1>
 
 Ferramenta visual para organizar a grade semanal de atividades e profissionais em unidades **CAPS** (Centros de Atenção Psicossocial). Monte turnos, salas e equipes com drag-and-drop, valide conflitos em tempo real e exporte tudo em PDF.
 

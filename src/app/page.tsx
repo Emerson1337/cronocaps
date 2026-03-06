@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ui/toggle";
+import { Logo } from "@/components/ui/Logo";
 import { useWorkspace } from "@/features/workspace/use-workspace";
 import { TEMPLATES } from "@/features/workspace/templates";
 import { SetupWizard } from "@/features/workspace/setup-wizard";
@@ -129,7 +130,8 @@ export default function HomePage() {
       </div>
       <div className="mx-auto flex w-full max-w-lg flex-col items-center gap-8">
         {/* Header */}
-        <div className="text-center">
+        <div className="flex flex-col items-center text-center">
+          <Logo size={56} className="mb-3" />
           <h1 className="text-3xl font-bold font-hand text-primary">
             CronoCaps
           </h1>

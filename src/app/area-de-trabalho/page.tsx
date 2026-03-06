@@ -11,6 +11,7 @@ import { FloatingToolbar } from "@/components/board/FloatingToolbar";
 import { AutoSaveIndicator } from "@/components/board/AutoSaveIndicator";
 import { RoomDetailPanel } from "@/components/board/RoomDetailPanel";
 import { Input } from "@/components/ui";
+import { Logo } from "@/components/ui/Logo";
 import { ExportPreviewModal } from "@/components/export";
 import { DndProvider } from "@/components/dnd";
 import { ActivityLabelModal } from "@/features/rooms/activity-label-modal";
@@ -392,6 +393,7 @@ function WorkspacePageInner() {
 
         {/* Centered workspace name */}
         <div className="flex relative items-center justify-center gap-2 pt-2 pb-1 sm:pt-3 shrink-0">
+          <Logo size={24} className="shrink-0" />
           {isEditingName ? (
             <Input
               value={editedName}
