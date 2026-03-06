@@ -60,19 +60,21 @@ function ShiftSectionComponent({
       )}
     >
       <div className="flex items-center gap-2">
-        <span className="text-xs font-semibold uppercase text-text-secondary tracking-wide">
-          {shift.label === "Manhã"
-            ? "☀️"
-            : shift.label === "Tarde"
-              ? "🌥️"
-              : shift.label === "Noite"
-                ? "🌙"
-                : "🕐"}{" "}
-          {shift.label}
-        </span>
-        <span className="text-xs text-text-secondary">
-          ({shift.startTime}&ndash;{shift.endTime})
-        </span>
+        <div className="flex flex-col">
+          <span className="text-xs font-semibold uppercase text-text-secondary tracking-wide">
+            {shift.label === "Manhã"
+              ? "☀️"
+              : shift.label === "Tarde"
+                ? "🌥️"
+                : shift.label === "Noite"
+                  ? "🌙"
+                  : "🕐"}{" "}
+            {shift.label}
+          </span>
+          <span className="text-xs text-text-secondary">
+            ({shift.startTime}&ndash;{shift.endTime})
+          </span>
+        </div>
         {onPaste != null && (
           <Button
             variant="ghost"
@@ -86,7 +88,7 @@ function ShiftSectionComponent({
             tabIndex={hasClipboard === true ? 0 : -1}
           >
             <ClipboardPaste size={14} aria-hidden="true" />
-            Colar sala
+            <span className="hidden xl:block">Colar sala</span>
           </Button>
         )}
       </div>
@@ -111,10 +113,19 @@ function ShiftSectionComponent({
             const hasConflict = conflictClassName.length > 0;
 
             let assignmentDetails: ReadonlyArray<AssignmentDetail> | undefined;
-            if (showDetails === true && professionals != null && categories != null) {
+            if (
+              showDetails === true &&
+              professionals != null &&
+              categories != null
+            ) {
               assignmentDetails = allocation.assignments.map((a) => {
-                const prof = professionals.find((p) => p.id === a.professionalId);
-                const cat = prof != null ? categories.find((c) => c.id === prof.categoryId) : undefined;
+                const prof = professionals.find(
+                  (p) => p.id === a.professionalId
+                );
+                const cat =
+                  prof != null
+                    ? categories.find((c) => c.id === prof.categoryId)
+                    : undefined;
                 return {
                   professionalName: prof?.name ?? "Desconhecido",
                   categoryName: cat?.name ?? "",
