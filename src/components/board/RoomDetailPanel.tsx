@@ -288,7 +288,7 @@ export function RoomDetailPanel({
       {/* Backdrop */}
       <div
         className={cn(
-          "fixed inset-0 z-60 bg-black/50 transition-opacity duration-200",
+          "fixed inset-0 z-50 bg-black/50 transition-opacity duration-200",
           isVisible ? "opacity-100" : "opacity-0"
         )}
         onClick={handleBackdropClick}
@@ -302,7 +302,7 @@ export function RoomDetailPanel({
         aria-label={`Detalhes da sala ${roomName}`}
         className={cn(
           // Mobile/tablet: slide up from bottom
-          "fixed z-50 bg-surface-card border-border shadow-xl",
+          "fixed z-60 bg-surface-card border-border shadow-xl",
           "inset-x-0 bottom-0 max-h-[85dvh] rounded-t-2xl border-t",
           "transition-transform duration-250 ease-[cubic-bezier(0.33,1,0.68,1)]",
           "overflow-y-auto scrollbar-minimal",
