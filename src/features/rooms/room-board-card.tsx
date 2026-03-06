@@ -4,6 +4,7 @@ import type { DraggableSyntheticListeners } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
 import { IconButton } from "@/components/ui";
 import { Copy, GripVertical, Trash2, UserPlus, Users } from "lucide-react";
+import { useIsPointerFine } from "@/hooks/use-pointer-fine";
 
 export interface AssignmentDetail {
   readonly professionalName: string;
@@ -45,6 +46,9 @@ export function RoomBoardCard({
   assignmentDetails,
   dragHandleProps,
 }: RoomBoardCardProps) {
+  const isPointerFine = useIsPointerFine();
+  const cardDrag = isPointerFine && dragHandleProps != null;
+
   return (
     <div
       role="button"
@@ -56,6 +60,8 @@ export function RoomBoardCard({
           onTap();
         }
       }}
+      {...(cardDrag ? dragHandleProps.listeners : undefined)}
+      {...(cardDrag ? dragHandleProps.attributes : undefined)}
       className={cn(
         "relative flex flex-col gap-1 rounded-lg border bg-surface-card p-2.5 text-left w-full",
         "min-h-[44px] min-w-[44px]",
@@ -67,7 +73,7 @@ export function RoomBoardCard({
         className
       )}
     >
-      {dragHandleProps != null && (
+      {dragHandleProps != null && !isPointerFine && (
         <button
           type="button"
           className="absolute top-2 right-2 p-2 rounded text-text-secondary/50 hover:text-text-secondary hover:bg-surface cursor-grab active:cursor-grabbing transition-colors"
@@ -78,6 +84,11 @@ export function RoomBoardCard({
         >
           <GripVertical size={16} aria-hidden="true" />
         </button>
+      )}
+      {dragHandleProps != null && isPointerFine && (
+        <div className="absolute top-2 right-2 p-2 rounded text-text-secondary/50 pointer-events-none">
+          <GripVertical size={16} aria-hidden="true" />
+        </div>
       )}
       <span className="text-xs text-text-secondary truncate w-full">
         {`Sala ${String(slotNumber)}`}

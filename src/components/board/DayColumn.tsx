@@ -42,46 +42,50 @@ function DayColumnComponent({
   onAddRoom,
 }: DayColumnProps) {
   return (
-    <div className="flex flex-col gap-3 w-full min-w-0">
+    <div
+      className="grid gap-3 w-full min-w-0 px-1"
+      style={{
+        gridTemplateRows: "subgrid",
+        gridRow: `span ${String(1 + shifts.length)}`,
+      }}
+    >
       <h2 className="text-sm font-semibold uppercase text-text-secondary text-center py-1.5">
         📅 {WEEKDAY_LABELS[day]}
       </h2>
 
-      <div className="flex flex-col gap-3 px-1">
-        {shifts.map((shift) => {
-          const shiftAllocations = allocations.filter(
-            (a) => a.day === day && a.shiftId === shift.id
-          );
+      {shifts.map((shift) => {
+        const shiftAllocations = allocations.filter(
+          (a) => a.day === day && a.shiftId === shift.id
+        );
 
-          const isOverCapacity = shiftAllocations.length >= roomsPerShift;
+        const isOverCapacity = shiftAllocations.length >= roomsPerShift;
 
-          return (
-            <DroppableShiftZone
-              key={shift.id}
-              day={day}
-              shiftId={shift.id}
-              isOverCapacity={isOverCapacity}
-            >
-              <ShiftSection
-                shift={shift}
-                allocations={shiftAllocations}
-                droppableId={`${day}:${shift.id}`}
-                onAllocationTap={onAllocationTap}
-                onAllocationQuickAdd={onAllocationQuickAdd}
-                onAllocationRemove={onAllocationRemove}
-                onAllocationCopy={onAllocationCopy}
-                onPaste={onPaste != null ? () => onPaste(day, shift.id) : undefined}
-                hasClipboard={hasClipboard}
-                getConflictStyle={getConflictStyle}
-                showDetails={showDetails}
-                professionals={professionals}
-                categories={categories}
-                onAddRoom={onAddRoom != null ? () => onAddRoom(day, shift.id) : undefined}
-              />
-            </DroppableShiftZone>
-          );
-        })}
-      </div>
+        return (
+          <DroppableShiftZone
+            key={shift.id}
+            day={day}
+            shiftId={shift.id}
+            isOverCapacity={isOverCapacity}
+          >
+            <ShiftSection
+              shift={shift}
+              allocations={shiftAllocations}
+              droppableId={`${day}:${shift.id}`}
+              onAllocationTap={onAllocationTap}
+              onAllocationQuickAdd={onAllocationQuickAdd}
+              onAllocationRemove={onAllocationRemove}
+              onAllocationCopy={onAllocationCopy}
+              onPaste={onPaste != null ? () => onPaste(day, shift.id) : undefined}
+              hasClipboard={hasClipboard}
+              getConflictStyle={getConflictStyle}
+              showDetails={showDetails}
+              professionals={professionals}
+              categories={categories}
+              onAddRoom={onAddRoom != null ? () => onAddRoom(day, shift.id) : undefined}
+            />
+          </DroppableShiftZone>
+        );
+      })}
     </div>
   );
 }

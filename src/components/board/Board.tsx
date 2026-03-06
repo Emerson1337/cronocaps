@@ -42,7 +42,10 @@ export function Board({
     <div className="flex-1 overflow-auto scrollbar-minimal">
       <div
         className="grid gap-4 p-4"
-        style={{ gridTemplateColumns: `repeat(${String(days.length)}, minmax(314px, 1fr))` }}
+        style={{
+          gridTemplateColumns: `repeat(${String(days.length)}, minmax(314px, 1fr))`,
+          gridTemplateRows: `auto repeat(${String(shifts.length)}, 1fr)`,
+        }}
       >
         {days.map((day) => (
           <DayColumn
