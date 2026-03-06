@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, type CSSProperties, type ReactNode } from "react";
-import { useDraggable } from "@dnd-kit/core";
+import { useDraggable, type DraggableSyntheticListeners } from "@dnd-kit/core";
 import type { ProfessionalDragData } from "./types";
 import { draggingSourceStyle } from "./animations";
 
@@ -10,7 +10,10 @@ interface DraggableProfessionalProps {
   readonly professionalName: string;
   readonly categoryId: string;
   readonly availability: ReadonlyArray<{ readonly day: string; readonly shiftId: string }>;
-  readonly children: ReactNode;
+  readonly children: (handleProps: {
+    listeners: DraggableSyntheticListeners;
+    attributes: Record<string, unknown>;
+  }) => ReactNode;
 }
 
 export const DraggableProfessional = React.memo(
@@ -42,8 +45,8 @@ export const DraggableProfessional = React.memo(
       : { touchAction: "none" };
 
     return (
-      <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-        {children}
+      <div ref={setNodeRef} style={style}>
+        {children({ listeners, attributes: { ...attributes, style: { touchAction: "none" } } })}
       </div>
     );
   }

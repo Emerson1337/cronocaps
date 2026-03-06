@@ -144,32 +144,35 @@ function ShiftSectionComponent({
                 sourceShiftId={allocation.shiftId}
                 activityLabel={allocation.activityLabel}
               >
-                <DroppableRoomTarget
-                  allocationId={allocation.id}
-                  day={allocation.day}
-                  shiftId={allocation.shiftId}
-                  assignedProfessionalIds={allocation.assignments.map(
-                    (a) => a.professionalId
-                  )}
-                >
-                  <RoomBoardCard
-                    slotNumber={index + 1}
-                    activityLabel={allocation.activityLabel}
-                    assignmentCount={allocation.assignments.length}
-                    onTap={() => onAllocationTap(allocation.id)}
-                    onQuickAdd={() => onAllocationQuickAdd(allocation.id)}
-                    onRemove={() => onAllocationRemove(allocation.id)}
-                    onCopy={
-                      onAllocationCopy != null
-                        ? () => onAllocationCopy(allocation.id)
-                        : undefined
-                    }
-                    hasConflict={hasConflict}
-                    className={conflictClassName}
-                    showDetails={showDetails}
-                    assignmentDetails={assignmentDetails}
-                  />
-                </DroppableRoomTarget>
+                {({ listeners, attributes }) => (
+                  <DroppableRoomTarget
+                    allocationId={allocation.id}
+                    day={allocation.day}
+                    shiftId={allocation.shiftId}
+                    assignedProfessionalIds={allocation.assignments.map(
+                      (a) => a.professionalId
+                    )}
+                  >
+                    <RoomBoardCard
+                      slotNumber={index + 1}
+                      activityLabel={allocation.activityLabel}
+                      assignmentCount={allocation.assignments.length}
+                      onTap={() => onAllocationTap(allocation.id)}
+                      onQuickAdd={() => onAllocationQuickAdd(allocation.id)}
+                      onRemove={() => onAllocationRemove(allocation.id)}
+                      onCopy={
+                        onAllocationCopy != null
+                          ? () => onAllocationCopy(allocation.id)
+                          : undefined
+                      }
+                      hasConflict={hasConflict}
+                      className={conflictClassName}
+                      showDetails={showDetails}
+                      assignmentDetails={assignmentDetails}
+                      dragHandleProps={{ listeners, attributes }}
+                    />
+                  </DroppableRoomTarget>
+                )}
               </DraggableAllocation>
             );
           })}

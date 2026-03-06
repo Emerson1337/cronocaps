@@ -17,16 +17,20 @@ export function ResourceIcons({ workspace }: ResourceIconsProps) {
     <>
       <div className="flex items-start justify-center gap-4 sm:gap-6 px-4 py-2 sm:py-3 shrink-0 relative">
         <DraggableRoom>
-          <div className="flex flex-col items-center gap-1">
-            <div
-              className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary border-2 border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-all duration-150 cursor-grab active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-              aria-label="Salas"
-              title="Arraste para adicionar sala"
-            >
-              <RoomIcon size={22} />
+          {({ listeners, attributes }) => (
+            <div className="flex flex-col items-center gap-1">
+              <div
+                className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary border-2 border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-all duration-150 cursor-grab active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                aria-label="Salas"
+                title="Arraste para adicionar sala"
+                {...listeners}
+                {...attributes}
+              >
+                <RoomIcon size={22} />
+              </div>
+              <span className="text-[10px] text-text-secondary select-none leading-tight text-center">Salas<br /><span className="text-text-secondary/60">(Arraste)</span></span>
             </div>
-            <span className="text-[10px] text-text-secondary select-none leading-tight text-center">Salas<br /><span className="text-text-secondary/60">(Arraste)</span></span>
-          </div>
+          )}
         </DraggableRoom>
 
         <div className="flex flex-col items-center gap-1">

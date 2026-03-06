@@ -1,14 +1,17 @@
 "use client";
 
 import React, { type CSSProperties, type ReactNode } from "react";
-import { useDraggable } from "@dnd-kit/core";
+import { useDraggable, type DraggableSyntheticListeners } from "@dnd-kit/core";
 import type { RoomDragData } from "./types";
 import { draggingSourceStyle } from "./animations";
 
 const ROOM_DRAG_DATA: RoomDragData = { type: "room" as const };
 
 interface DraggableRoomProps {
-  readonly children: ReactNode;
+  readonly children: (handleProps: {
+    listeners: DraggableSyntheticListeners;
+    attributes: Record<string, unknown>;
+  }) => ReactNode;
 }
 
 export const DraggableRoom = React.memo(function DraggableRoom({
@@ -24,8 +27,8 @@ export const DraggableRoom = React.memo(function DraggableRoom({
     : { touchAction: "none" };
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      {children}
+    <div ref={setNodeRef} style={style}>
+      {children({ listeners, attributes: { ...attributes, style: { touchAction: "none" } } })}
     </div>
   );
 });

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, type CSSProperties, type ReactNode } from "react";
-import { useDraggable } from "@dnd-kit/core";
+import { useDraggable, type DraggableSyntheticListeners } from "@dnd-kit/core";
 import type { AllocationDragData } from "./types";
 import { draggingSourceStyle } from "./animations";
 import { useDndState } from "./DndProvider";
@@ -11,7 +11,10 @@ interface DraggableAllocationProps {
   readonly sourceDay: string;
   readonly sourceShiftId: string;
   readonly activityLabel: string;
-  readonly children: ReactNode;
+  readonly children: (handleProps: {
+    listeners: DraggableSyntheticListeners;
+    attributes: Record<string, unknown>;
+  }) => ReactNode;
 }
 
 export const DraggableAllocation = React.memo(
@@ -49,8 +52,8 @@ export const DraggableAllocation = React.memo(
         : { touchAction: "none" };
 
     return (
-      <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-        {children}
+      <div ref={setNodeRef} style={style}>
+        {children({ listeners, attributes: { ...attributes, style: { touchAction: "none" } } })}
       </div>
     );
   }

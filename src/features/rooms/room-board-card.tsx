@@ -1,8 +1,9 @@
 "use client";
 
+import type { DraggableSyntheticListeners } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
 import { IconButton } from "@/components/ui";
-import { Copy, Trash2, UserPlus, Users } from "lucide-react";
+import { Copy, GripVertical, Trash2, UserPlus, Users } from "lucide-react";
 
 export interface AssignmentDetail {
   readonly professionalName: string;
@@ -22,6 +23,10 @@ interface RoomBoardCardProps {
   readonly className?: string;
   readonly showDetails?: boolean | undefined;
   readonly assignmentDetails?: ReadonlyArray<AssignmentDetail> | undefined;
+  readonly dragHandleProps?: {
+    listeners: DraggableSyntheticListeners;
+    attributes: Record<string, unknown>;
+  } | undefined;
 }
 
 export function RoomBoardCard({
@@ -36,6 +41,7 @@ export function RoomBoardCard({
   className,
   showDetails,
   assignmentDetails,
+  dragHandleProps,
 }: RoomBoardCardProps) {
   return (
     <div
@@ -49,7 +55,7 @@ export function RoomBoardCard({
         }
       }}
       className={cn(
-        "flex flex-col gap-1 rounded-lg border bg-surface-card p-2.5 text-left w-full",
+        "relative flex flex-col gap-1 rounded-lg border bg-surface-card p-2.5 text-left w-full",
         "min-h-[44px] min-w-[44px]",
         "transition-all duration-150 cursor-pointer",
         "hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
@@ -59,6 +65,18 @@ export function RoomBoardCard({
         className
       )}
     >
+      {dragHandleProps != null && (
+        <button
+          type="button"
+          className="absolute top-1 right-1 p-0.5 rounded text-text-secondary/50 hover:text-text-secondary hover:bg-surface cursor-grab active:cursor-grabbing transition-colors"
+          aria-label="Arrastar sala"
+          onClick={(e) => e.stopPropagation()}
+          {...dragHandleProps.listeners}
+          {...dragHandleProps.attributes}
+        >
+          <GripVertical size={14} aria-hidden="true" />
+        </button>
+      )}
       <span className="text-xs text-text-secondary truncate w-full">
         {`Sala ${String(slotNumber)}`}
       </span>

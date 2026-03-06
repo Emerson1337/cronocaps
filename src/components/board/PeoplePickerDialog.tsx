@@ -137,57 +137,63 @@ export function PeoplePickerDialog({
               categoryId={professional.categoryId}
               availability={professional.availability}
             >
-              <div className="flex items-center gap-2 rounded-lg border border-border bg-surface-card px-3 py-2 min-h-[44px] cursor-grab active:cursor-grabbing hover:bg-surface transition-colors">
-                <span
-                  className={cn(
-                    "inline-block w-2.5 h-2.5 rounded-full shrink-0",
-                    professional.availability.length > 0
-                      ? "bg-green-500"
-                      : "bg-gray-400"
-                  )}
-                />
-                <span className="flex-1 min-w-0 flex items-center gap-1.5">
-                  <span className="text-sm font-medium text-text-primary truncate">
-                    {professional.name}
-                  </span>
-                  {(roomCountMap.get(professional.id) ?? 0) > 0 && (
-                    <span className="shrink-0 text-[10px] text-text-secondary bg-surface rounded-full px-1.5 py-0.5 leading-none">
-                      {roomCountMap.get(professional.id)}{" "}
-                      {roomCountMap.get(professional.id) === 1
-                        ? "atividade"
-                        : "atividades"}
+              {({ listeners, attributes }) => (
+                <div className="flex items-center gap-2 rounded-lg border border-border bg-surface-card px-3 py-2 min-h-[44px] hover:bg-surface transition-colors">
+                  <span
+                    className={cn(
+                      "inline-block w-2.5 h-2.5 rounded-full shrink-0",
+                      professional.availability.length > 0
+                        ? "bg-green-500"
+                        : "bg-gray-400"
+                    )}
+                  />
+                  <span className="flex-1 min-w-0 flex items-center gap-1.5">
+                    <span className="text-sm font-medium text-text-primary truncate">
+                      {professional.name}
                     </span>
-                  )}
-                </span>
-                <span
-                  className="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium text-white"
-                  style={{
-                    backgroundColor: getCategoryColor(professional.categoryId),
-                  }}
-                >
-                  {getCategoryName(professional.categoryId)}
-                </span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-text-secondary shrink-0"
-                  aria-hidden="true"
-                >
-                  <line x1="8" y1="6" x2="21" y2="6" />
-                  <line x1="8" y1="12" x2="21" y2="12" />
-                  <line x1="8" y1="18" x2="21" y2="18" />
-                  <line x1="3" y1="6" x2="3.01" y2="6" />
-                  <line x1="3" y1="12" x2="3.01" y2="12" />
-                  <line x1="3" y1="18" x2="3.01" y2="18" />
-                </svg>
-              </div>
+                    {(roomCountMap.get(professional.id) ?? 0) > 0 && (
+                      <span className="shrink-0 text-[10px] text-text-secondary bg-surface rounded-full px-1.5 py-0.5 leading-none">
+                        {roomCountMap.get(professional.id)}{" "}
+                        {roomCountMap.get(professional.id) === 1
+                          ? "atividade"
+                          : "atividades"}
+                      </span>
+                    )}
+                  </span>
+                  <span
+                    className="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium text-white"
+                    style={{
+                      backgroundColor: getCategoryColor(professional.categoryId),
+                    }}
+                  >
+                    {getCategoryName(professional.categoryId)}
+                  </span>
+                  <button
+                    type="button"
+                    className="shrink-0 cursor-grab active:cursor-grabbing p-1 rounded text-text-secondary hover:text-text-primary hover:bg-surface transition-colors"
+                    aria-label="Arrastar profissional"
+                    {...listeners}
+                    {...attributes}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <circle cx="9" cy="5" r="1" /><circle cx="15" cy="5" r="1" />
+                      <circle cx="9" cy="12" r="1" /><circle cx="15" cy="12" r="1" />
+                      <circle cx="9" cy="19" r="1" /><circle cx="15" cy="19" r="1" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </DraggableProfessional>
           ))}
           {filtered.length === 0 && (
