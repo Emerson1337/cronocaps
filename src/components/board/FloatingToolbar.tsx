@@ -68,7 +68,7 @@ export function FloatingToolbar({
         onClick={onUndo}
         disabled={!canUndo}
         className={cn(
-          "flex items-center justify-center w-9 h-9 rounded-lg transition-colors cursor-pointer",
+          "flex items-center justify-center w-full h-10 rounded-lg transition-colors cursor-pointer",
           canUndo
             ? "text-text-secondary hover:text-text-primary hover:bg-surface"
             : "text-text-secondary/30 cursor-not-allowed"
@@ -83,7 +83,7 @@ export function FloatingToolbar({
         onClick={onRedo}
         disabled={!canRedo}
         className={cn(
-          "flex items-center justify-center w-9 h-9 rounded-lg transition-colors cursor-pointer",
+          "flex items-center justify-center w-full h-10 rounded-lg transition-colors cursor-pointer",
           canRedo
             ? "text-text-secondary hover:text-text-primary hover:bg-surface"
             : "text-text-secondary/30 cursor-not-allowed"
@@ -106,7 +106,7 @@ export function FloatingToolbar({
         type="button"
         onClick={onToggleRoomsSummary}
         className={cn(
-          "flex items-center justify-center w-9 h-9 rounded-lg transition-colors cursor-pointer",
+          "flex items-center justify-center w-full h-10 rounded-lg transition-colors cursor-pointer",
           showRoomsSummary
             ? "text-primary bg-primary/10"
             : "text-text-secondary hover:text-text-primary hover:bg-surface"
@@ -120,7 +120,7 @@ export function FloatingToolbar({
       <button
         type="button"
         onClick={onExport}
-        className="flex items-center justify-center w-9 h-9 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface transition-colors cursor-pointer"
+        className="flex items-center justify-center w-full h-10 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface transition-colors cursor-pointer"
         aria-label="Exportar PDF"
         title="Exportar PDF"
       >
@@ -146,7 +146,7 @@ export function FloatingToolbar({
 
       <Link
         href="/area-de-trabalho/configuracoes"
-        className="flex items-center justify-center w-9 h-9 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface transition-colors"
+        className="flex items-center justify-center w-full h-10 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface transition-colors"
         aria-label="Configurações"
         title="Configurações"
       >
@@ -185,7 +185,7 @@ export function FloatingToolbar({
           type="button"
           onClick={() => setMobileOpen((prev) => !prev)}
           className={cn(
-            "flex items-center justify-center w-10 h-10 rounded-xl border border-border bg-surface-card/80 backdrop-blur-sm shadow-lg transition-colors cursor-pointer",
+            "flex items-center justify-center w-full h-10 rounded-xl border border-border bg-surface-card/80 backdrop-blur-sm shadow-lg transition-colors cursor-pointer",
             mobileOpen
               ? "text-primary bg-primary/10"
               : "text-text-secondary hover:text-text-primary"
@@ -211,7 +211,7 @@ export function FloatingToolbar({
             "origin-top-right transition-all duration-200 ease-out",
             mobileOpen
               ? "scale-100 opacity-100"
-              : "scale-90 opacity-0 pointer-events-none"
+              : "scale-100 opacity-0 pointer-events-none"
           )}
           style={{ maxWidth: "calc(100vw - 24px)" }}
         >
