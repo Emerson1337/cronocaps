@@ -10,12 +10,13 @@ export function ThemeToggle() {
     <IconButton
       label={theme === "light" ? "Ativar tema escuro" : "Ativar tema claro"}
       onClick={toggleTheme}
+      className="w-9 h-9 min-h-0 min-w-0 p-0"
     >
       {theme === "light" ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
+          width="18"
+          height="18"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -28,8 +29,8 @@ export function ThemeToggle() {
       ) : (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
+          width="18"
+          height="18"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
