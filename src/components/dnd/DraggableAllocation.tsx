@@ -4,6 +4,7 @@ import React, { useMemo, type CSSProperties, type ReactNode } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import type { AllocationDragData } from "./types";
 import { draggingSourceStyle } from "./animations";
+import { useDndState } from "./DndProvider";
 
 interface DraggableAllocationProps {
   readonly allocationId: string;
@@ -37,9 +38,15 @@ export const DraggableAllocation = React.memo(
       data,
     });
 
-    const style: CSSProperties | undefined = isDragging
-      ? draggingSourceStyle
-      : undefined;
+    const { activeDragItem } = useDndState();
+    const isRoomBeingDragged =
+      activeDragItem !== null && activeDragItem.type === "room";
+
+    const style: CSSProperties = isDragging
+      ? { ...draggingSourceStyle, touchAction: "none" }
+      : isRoomBeingDragged
+        ? { touchAction: "none", pointerEvents: "none" }
+        : { touchAction: "none" };
 
     return (
       <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
