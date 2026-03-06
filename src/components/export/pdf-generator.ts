@@ -124,24 +124,20 @@ function autoTableWithResult(
   doc: jsPDF,
   options: UserOptions
 ): TableResult | undefined {
-  let result: TableResult | undefined;
+  autoTable(doc, options);
 
-  const originalDidDrawPage = options.didDrawPage;
+  // jspdf-autotable stores the last table result on the doc instance
+  const lastTable = (doc as unknown as Record<string, unknown>)["lastAutoTable"];
+  if (
+    lastTable != null &&
+    typeof lastTable === "object" &&
+    "finalY" in lastTable &&
+    typeof (lastTable as Record<string, unknown>)["finalY"] === "number"
+  ) {
+    return { finalY: (lastTable as Record<string, unknown>)["finalY"] as number };
+  }
 
-  autoTable(doc, {
-    ...options,
-    didDrawPage: (data) => {
-      const tableFinalY = data.table.finalY;
-      if (typeof tableFinalY === "number") {
-        result = { finalY: tableFinalY };
-      }
-      if (originalDidDrawPage !== undefined) {
-        originalDidDrawPage(data);
-      }
-    },
-  });
-
-  return result;
+  return undefined;
 }
 
 // ── PDF Page Constants ───────────────────────────────────────────
@@ -381,7 +377,7 @@ export function generateSchedulePdf(input: PdfGeneratorInput): void {
 
       const tableOptions: UserOptions = {
         startY: cursorY,
-        margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
+        margin: { left: PAGE_MARGIN, right: PAGE_MARGIN, bottom: FOOTER_HEIGHT + 4 },
         tableWidth: "auto",
         theme: "grid",
         head: [headRow],
@@ -483,7 +479,7 @@ export function generateSchedulePdf(input: PdfGeneratorInput): void {
 
   const profTableResult = autoTableWithResult(doc, {
     startY: summaryY,
-    margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
+    margin: { left: PAGE_MARGIN, right: PAGE_MARGIN, bottom: FOOTER_HEIGHT + 4 },
     theme: "grid",
     head: profPerDayHead,
     body: profPerDayBody,
@@ -565,7 +561,7 @@ export function generateSchedulePdf(input: PdfGeneratorInput): void {
 
   const occupancyTableResult = autoTableWithResult(doc, {
     startY: summaryY,
-    margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
+    margin: { left: PAGE_MARGIN, right: PAGE_MARGIN, bottom: FOOTER_HEIGHT + 4 },
     theme: "grid",
     head: occupancyHead,
     body: occupancyBody,
@@ -683,7 +679,7 @@ export function generateSchedulePdf(input: PdfGeneratorInput): void {
 
     autoTable(doc, {
       startY: summaryY,
-      margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
+      margin: { left: PAGE_MARGIN, right: PAGE_MARGIN, bottom: FOOTER_HEIGHT + 4 },
       theme: "grid",
       head: conflictHead,
       body: conflictBody,
