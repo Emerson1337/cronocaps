@@ -21,6 +21,7 @@ interface DayColumnProps {
   readonly showDetails?: boolean | undefined;
   readonly professionals?: ReadonlyArray<Professional> | undefined;
   readonly categories?: ReadonlyArray<Category> | undefined;
+  readonly onAddRoom?: ((day: WeekDay, shiftId: string) => void) | undefined;
 }
 
 function DayColumnComponent({
@@ -38,6 +39,7 @@ function DayColumnComponent({
   showDetails,
   professionals,
   categories,
+  onAddRoom,
 }: DayColumnProps) {
   return (
     <div className="flex flex-col gap-3 w-full min-w-0">
@@ -74,6 +76,7 @@ function DayColumnComponent({
                 showDetails={showDetails}
                 professionals={professionals}
                 categories={categories}
+                onAddRoom={onAddRoom != null ? () => onAddRoom(day, shift.id) : undefined}
               />
             </DroppableShiftZone>
           );

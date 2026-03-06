@@ -14,6 +14,8 @@ import { Input } from "@/components/ui";
 import { ExportPreviewModal } from "@/components/export";
 import { DndProvider } from "@/components/dnd";
 import { ActivityLabelModal } from "@/features/rooms/activity-label-modal";
+import { AddProfessionalPicker } from "@/components/board/detail/AddProfessionalPicker";
+import { TimePicker } from "@/components/dnd/TimePicker";
 import { MoveConflictDialog } from "@/components/board/MoveConflictDialog";
 import { ClipboardProvider, useClipboard } from "@/contexts/clipboard-context";
 import { ToastProvider, useToast } from "@/components/ui/toast";
@@ -94,6 +96,14 @@ function WorkspacePageInner() {
     useState<PendingRoomDrop | null>(null);
   const [pendingAllocationMove, setPendingAllocationMove] =
     useState<PendingAllocationMove | null>(null);
+  const [quickAddAllocationId, setQuickAddAllocationId] = useState<
+    string | null
+  >(null);
+  const [quickAddTimePicker, setQuickAddTimePicker] = useState<{
+    allocationId: string;
+    professionalId: string;
+    professionalName: string;
+  } | null>(null);
 
   useEffect(() => {
     if (isLoaded && workspace === null) {
@@ -244,8 +254,36 @@ function WorkspacePageInner() {
   }, []);
 
   const handleAllocationQuickAdd = useCallback((allocationId: string) => {
-    setSelectedAllocationId(allocationId);
+    setQuickAddAllocationId(allocationId);
   }, []);
+
+  const handleQuickAddSelect = useCallback(
+    (professionalId: string) => {
+      if (workspace === null || quickAddAllocationId === null) return;
+      const prof = workspace.professionals.find((p) => p.id === professionalId);
+      setQuickAddTimePicker({
+        allocationId: quickAddAllocationId,
+        professionalId,
+        professionalName: prof?.name ?? "Profissional",
+      });
+      setQuickAddAllocationId(null);
+    },
+    [workspace, quickAddAllocationId]
+  );
+
+  const handleQuickAddTimeConfirm = useCallback(
+    (startTime: string, endTime: string) => {
+      if (quickAddTimePicker === null) return;
+      schedule.addAssignment(
+        quickAddTimePicker.allocationId,
+        quickAddTimePicker.professionalId,
+        startTime,
+        endTime
+      );
+      setQuickAddTimePicker(null);
+    },
+    [quickAddTimePicker, schedule]
+  );
 
   const handleAllocationRemove = useCallback(
     (allocationId: string) => {
@@ -381,7 +419,6 @@ function WorkspacePageInner() {
 
         {/* Resource Icons */}
         <ResourceIcons workspace={workspace} />
-
         {/* Board */}
         <Board
           days={workspace.days}
@@ -398,6 +435,7 @@ function WorkspacePageInner() {
           showDetails={isRoomsSummaryOpen}
           professionals={workspace.professionals}
           categories={workspace.categories}
+          onAddRoom={handleRoomDrop}
         />
 
         {/* Activity label modal (after room drop) */}
@@ -422,6 +460,52 @@ function WorkspacePageInner() {
           onRemoveAssignment={schedule.removeAssignment}
           onUpdateAssignment={schedule.updateAssignment}
         />
+
+        {/* Quick-add professional picker */}
+        {workspace !== null &&
+          quickAddAllocationId !== null &&
+          (() => {
+            const alloc = workspace.allocations.find(
+              (a) => a.id === quickAddAllocationId
+            );
+            if (alloc === undefined) return null;
+            return (
+              <AddProfessionalPicker
+                open
+                onClose={() => setQuickAddAllocationId(null)}
+                professionals={workspace.professionals}
+                categories={workspace.categories}
+                allocations={workspace.allocations}
+                day={alloc.day}
+                shiftId={alloc.shiftId}
+                onSelect={handleQuickAddSelect}
+              />
+            );
+          })()}
+
+        {/* Quick-add time picker */}
+        {workspace !== null &&
+          quickAddTimePicker !== null &&
+          (() => {
+            const alloc = workspace.allocations.find(
+              (a) => a.id === quickAddTimePicker.allocationId
+            );
+            const shift =
+              alloc !== undefined
+                ? workspace.shifts.find((s) => s.id === alloc.shiftId)
+                : undefined;
+            if (shift === undefined) return null;
+            return (
+              <TimePicker
+                open
+                onClose={() => setQuickAddTimePicker(null)}
+                professionalName={quickAddTimePicker.professionalName}
+                shiftStartTime={shift.startTime}
+                shiftEndTime={shift.endTime}
+                onConfirm={handleQuickAddTimeConfirm}
+              />
+            );
+          })()}
 
         {/* Move Conflict Dialog */}
         <MoveConflictDialog

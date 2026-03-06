@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ClipboardPaste } from "lucide-react";
+import { ClipboardPaste, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui";
 import { RoomBoardCard } from "@/features/rooms/room-board-card";
@@ -26,6 +26,7 @@ interface ShiftSectionProps {
   readonly showDetails?: boolean | undefined;
   readonly professionals?: ReadonlyArray<Professional> | undefined;
   readonly categories?: ReadonlyArray<Category> | undefined;
+  readonly onAddRoom?: (() => void) | undefined;
 }
 
 function ShiftSectionComponent({
@@ -44,6 +45,7 @@ function ShiftSectionComponent({
   showDetails,
   professionals,
   categories,
+  onAddRoom,
 }: ShiftSectionProps) {
   const isEmpty = allocations.length === 0;
 
@@ -172,6 +174,17 @@ function ShiftSectionComponent({
             );
           })}
         </div>
+      )}
+
+      {onAddRoom != null && (
+        <Button
+          variant="ghost"
+          onClick={onAddRoom}
+          className="w-full text-xs py-1.5 h-auto gap-1 border border-dashed border-border text-text-secondary hover:border-primary hover:text-primary"
+        >
+          <Plus size={14} aria-hidden="true" />
+          Adicionar Sala
+        </Button>
       )}
     </div>
   );

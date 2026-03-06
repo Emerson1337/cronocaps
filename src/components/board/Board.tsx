@@ -18,6 +18,7 @@ interface BoardProps {
   readonly showDetails?: boolean | undefined;
   readonly professionals?: ReadonlyArray<Professional> | undefined;
   readonly categories?: ReadonlyArray<Category> | undefined;
+  readonly onAddRoom?: ((day: WeekDay, shiftId: string) => void) | undefined;
 }
 
 export function Board({
@@ -35,12 +36,13 @@ export function Board({
   showDetails,
   professionals,
   categories,
+  onAddRoom,
 }: BoardProps) {
   return (
     <div className="flex-1 overflow-auto scrollbar-minimal">
       <div
         className="grid gap-4 p-4"
-        style={{ gridTemplateColumns: `repeat(${String(days.length)}, minmax(220px, 1fr))` }}
+        style={{ gridTemplateColumns: `repeat(${String(days.length)}, minmax(314px, 1fr))` }}
       >
         {days.map((day) => (
           <DayColumn
@@ -59,6 +61,7 @@ export function Board({
             showDetails={showDetails}
             professionals={professionals}
             categories={categories}
+            onAddRoom={onAddRoom}
           />
         ))}
       </div>
