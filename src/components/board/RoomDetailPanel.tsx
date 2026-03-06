@@ -304,7 +304,7 @@ export function RoomDetailPanel({
           // Mobile/tablet: slide up from bottom
           "fixed z-50 bg-surface-card border-border shadow-xl",
           "inset-x-0 bottom-0 max-h-[85dvh] rounded-t-2xl border-t",
-          "transition-transform duration-[250ms] [transition-timing-function:cubic-bezier(0.33,1,0.68,1)]",
+          "transition-transform duration-250 ease-[cubic-bezier(0.33,1,0.68,1)]",
           "overflow-y-auto scrollbar-minimal",
           // Desktop: slide in from right
           "lg:inset-x-auto lg:right-0 lg:top-0 lg:bottom-0 lg:max-h-full lg:w-[420px] lg:rounded-t-none lg:rounded-l-2xl lg:border-t-0 lg:border-l",

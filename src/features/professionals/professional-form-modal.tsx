@@ -4,7 +4,12 @@ import { useState, useCallback, useMemo } from "react";
 import { Button, Input, Modal, Select } from "@/components/ui";
 import { WEEKDAY_SHORT_LABELS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import type { AvailabilitySlot, Professional, WeekDay, Workspace } from "@/types";
+import type {
+  AvailabilitySlot,
+  Professional,
+  WeekDay,
+  Workspace,
+} from "@/types";
 import { useProfessionals } from "./use-professionals";
 import { useCategories, CATEGORY_COLORS } from "./use-categories";
 
@@ -55,11 +60,15 @@ export function ProfessionalFormModal({
 
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [availability, setAvailability] = useState<ReadonlyArray<AvailabilitySlot>>([]);
+  const [availability, setAvailability] = useState<
+    ReadonlyArray<AvailabilitySlot>
+  >([]);
 
   const [showNewCategory, setShowNewCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
-  const [newCategoryColor, setNewCategoryColor] = useState(CATEGORY_COLORS[0] ?? "#10B981");
+  const [newCategoryColor, setNewCategoryColor] = useState(
+    CATEGORY_COLORS[0] ?? "#10B981"
+  );
 
   const [errors, setErrors] = useState<{
     readonly name?: string;
@@ -92,7 +101,10 @@ export function ProfessionalFormModal({
   const getShiftTimes = useCallback(
     (shiftId: string) => {
       const shift = shifts.find((s) => s.id === shiftId);
-      return { startTime: shift?.startTime ?? "07:00", endTime: shift?.endTime ?? "12:00" };
+      return {
+        startTime: shift?.startTime ?? "07:00",
+        endTime: shift?.endTime ?? "12:00",
+      };
     },
     [shifts]
   );
@@ -109,14 +121,22 @@ export function ProfessionalFormModal({
           );
         }
         const times = getShiftTimes(shiftId);
-        return [...prev, { day, shiftId, startTime: times.startTime, endTime: times.endTime }];
+        return [
+          ...prev,
+          { day, shiftId, startTime: times.startTime, endTime: times.endTime },
+        ];
       });
     },
     [getShiftTimes]
   );
 
   const updateSlotTime = useCallback(
-    (day: WeekDay, shiftId: string, field: "startTime" | "endTime", value: string) => {
+    (
+      day: WeekDay,
+      shiftId: string,
+      field: "startTime" | "endTime",
+      value: string
+    ) => {
       setAvailability((prev) =>
         prev.map((slot) =>
           slot.day === day && slot.shiftId === shiftId
@@ -149,7 +169,8 @@ export function ProfessionalFormModal({
     }
 
     if (availability.length === 0) {
-      newErrors.availability = "Selecione ao menos um horário de disponibilidade";
+      newErrors.availability =
+        "Selecione ao menos um horário de disponibilidade";
     }
 
     setErrors(newErrors);
@@ -165,7 +186,11 @@ export function ProfessionalFormModal({
       updateWorkspace((prev) => {
         const updatedCategories = [
           ...prev.categories,
-          { id: newCatId, name: newCategoryName.trim(), color: newCategoryColor },
+          {
+            id: newCatId,
+            name: newCategoryName.trim(),
+            color: newCategoryColor,
+          },
         ];
 
         let updatedProfessionals;
@@ -242,10 +267,18 @@ export function ProfessionalFormModal({
           return prev.filter((slot) => slot.day !== day);
         }
         const existing = prev.filter((slot) => slot.day !== day);
-        return [...existing, ...shifts.map((s) => {
-          const times = getShiftTimes(s.id);
-          return { day, shiftId: s.id, startTime: times.startTime, endTime: times.endTime };
-        })];
+        return [
+          ...existing,
+          ...shifts.map((s) => {
+            const times = getShiftTimes(s.id);
+            return {
+              day,
+              shiftId: s.id,
+              startTime: times.startTime,
+              endTime: times.endTime,
+            };
+          }),
+        ];
       });
     },
     [shifts, getShiftTimes]
@@ -262,7 +295,15 @@ export function ProfessionalFormModal({
         }
         const existing = prev.filter((slot) => slot.shiftId !== shiftId);
         const times = getShiftTimes(shiftId);
-        return [...existing, ...days.map((d) => ({ day: d, shiftId, startTime: times.startTime, endTime: times.endTime }))];
+        return [
+          ...existing,
+          ...days.map((d) => ({
+            day: d,
+            shiftId,
+            startTime: times.startTime,
+            endTime: times.endTime,
+          })),
+        ];
       });
     },
     [days, getShiftTimes]
@@ -274,30 +315,35 @@ export function ProfessionalFormModal({
       if (prev.length === total) {
         return [];
       }
-      return days.flatMap((day) => shifts.map((s) => {
-        const times = getShiftTimes(s.id);
-        return { day, shiftId: s.id, startTime: times.startTime, endTime: times.endTime };
-      }));
+      return days.flatMap((day) =>
+        shifts.map((s) => {
+          const times = getShiftTimes(s.id);
+          return {
+            day,
+            shiftId: s.id,
+            startTime: times.startTime,
+            endTime: times.endTime,
+          };
+        })
+      );
     });
   }, [days, shifts, getShiftTimes]);
 
   const allCount = days.length * shifts.length;
 
   const isDayFullySelected = useMemo(
-    () =>
-      (day: WeekDay) =>
-        shifts.every((s) =>
-          availability.some((slot) => slot.day === day && slot.shiftId === s.id)
-        ),
+    () => (day: WeekDay) =>
+      shifts.every((s) =>
+        availability.some((slot) => slot.day === day && slot.shiftId === s.id)
+      ),
     [shifts, availability]
   );
 
   const isShiftFullySelected = useMemo(
-    () =>
-      (shiftId: string) =>
-        days.every((d) =>
-          availability.some((slot) => slot.day === d && slot.shiftId === shiftId)
-        ),
+    () => (shiftId: string) =>
+      days.every((d) =>
+        availability.some((slot) => slot.day === d && slot.shiftId === shiftId)
+      ),
     [days, availability]
   );
 
@@ -358,10 +404,14 @@ export function ProfessionalFormModal({
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
                 placeholder="Ex: Psicólogo(a)"
-                {...(errors.categoryId !== undefined ? { error: errors.categoryId } : {})}
+                {...(errors.categoryId !== undefined
+                  ? { error: errors.categoryId }
+                  : {})}
               />
               <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-text-primary">Cor</span>
+                <span className="text-sm font-medium text-text-primary">
+                  Cor
+                </span>
                 <div className="flex flex-wrap gap-2">
                   {CATEGORY_COLORS.map((color) => (
                     <button
@@ -408,7 +458,9 @@ export function ProfessionalFormModal({
               onClick={toggleAll}
               className="text-xs text-primary hover:underline cursor-pointer"
             >
-              {availability.length === allCount ? "Desmarcar tudo" : "Selecionar tudo"}
+              {availability.length === allCount
+                ? "Desmarcar tudo"
+                : "Selecionar tudo"}
             </button>
           </div>
           <p className="text-xs text-text-secondary -mt-1">
@@ -468,7 +520,8 @@ export function ProfessionalFormModal({
                       </td>
                       {shifts.map((shift) => {
                         const isChecked = availability.some(
-                          (slot) => slot.day === day && slot.shiftId === shift.id
+                          (slot) =>
+                            slot.day === day && slot.shiftId === shift.id
                         );
                         return (
                           <td key={shift.id} className="p-1 text-center">
@@ -549,11 +602,19 @@ export function ProfessionalFormModal({
                           value={slotStart}
                           onChange={(v) => {
                             for (const slot of slotsForShift) {
-                              updateSlotTime(slot.day, shift.id, "startTime", v);
+                              updateSlotTime(
+                                slot.day,
+                                shift.id,
+                                "startTime",
+                                v
+                              );
                             }
                           }}
-                          options={generateTimeOptionsForShift(shift.startTime, shift.endTime)}
-                          className="w-[6.5rem]"
+                          options={generateTimeOptionsForShift(
+                            shift.startTime,
+                            shift.endTime
+                          )}
+                          className="w-26"
                         />
                         <span className="text-xs text-text-secondary">às</span>
                         <Select
@@ -563,8 +624,11 @@ export function ProfessionalFormModal({
                               updateSlotTime(slot.day, shift.id, "endTime", v);
                             }
                           }}
-                          options={generateTimeOptionsForShift(shift.startTime, shift.endTime)}
-                          className="w-[6.5rem]"
+                          options={generateTimeOptionsForShift(
+                            shift.startTime,
+                            shift.endTime
+                          )}
+                          className="w-26"
                         />
                       </div>
                     </div>
