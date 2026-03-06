@@ -28,7 +28,8 @@ export function PeoplePickerDialog({
   );
   const { activeDragItem } = useDndState();
 
-  const isDragging = activeDragItem !== null && activeDragItem.type === "professional";
+  const isDragging =
+    activeDragItem !== null && activeDragItem.type === "professional";
 
   const roomCountMap = useMemo(() => {
     const counts = new Map<string, number>();
@@ -72,7 +73,12 @@ export function PeoplePickerDialog({
   );
 
   return (
-    <Modal open={open} onClose={onClose} title="Profissionais" visuallyHidden={isDragging}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Profissionais"
+      visuallyHidden={isDragging}
+    >
       <div className="flex flex-col gap-3">
         <Input
           value={search}
@@ -148,14 +154,16 @@ export function PeoplePickerDialog({
                     <span className="shrink-0 text-[10px] text-text-secondary bg-surface rounded-full px-1.5 py-0.5 leading-none">
                       {roomCountMap.get(professional.id)}{" "}
                       {roomCountMap.get(professional.id) === 1
-                        ? "sala"
-                        : "salas"}
+                        ? "atividade"
+                        : "atividades"}
                     </span>
                   )}
                 </span>
                 <span
                   className="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium text-white"
-                  style={{ backgroundColor: getCategoryColor(professional.categoryId) }}
+                  style={{
+                    backgroundColor: getCategoryColor(professional.categoryId),
+                  }}
                 >
                   {getCategoryName(professional.categoryId)}
                 </span>

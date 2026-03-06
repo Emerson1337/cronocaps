@@ -104,11 +104,7 @@ export function AddProfessionalPicker({
   );
 
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      title="Adicionar Profissional"
-    >
+    <Modal open={open} onClose={handleClose} title="Adicionar Profissional">
       <div className="flex flex-col gap-3">
         <Input
           placeholder="Buscar profissional..."
@@ -149,8 +145,8 @@ export function AddProfessionalPicker({
                         <span className="shrink-0 text-[10px] text-text-secondary bg-surface rounded-full px-1.5 py-0.5 leading-none">
                           {roomCountMap.get(professional.id)}{" "}
                           {roomCountMap.get(professional.id) === 1
-                            ? "sala"
-                            : "salas"}
+                            ? "atividade"
+                            : "atividades"}
                         </span>
                       )}
                     </span>
