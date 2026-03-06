@@ -19,9 +19,9 @@ export const DraggableRoom = React.memo(function DraggableRoom({
     data: ROOM_DRAG_DATA,
   });
 
-  const style: CSSProperties | undefined = isDragging
-    ? draggingSourceStyle
-    : undefined;
+  const style: CSSProperties = isDragging
+    ? { ...draggingSourceStyle, touchAction: "none" }
+    : { touchAction: "none" };
 
   return (
     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>

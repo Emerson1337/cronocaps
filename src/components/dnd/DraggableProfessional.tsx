@@ -37,9 +37,9 @@ export const DraggableProfessional = React.memo(
       data,
     });
 
-    const style: CSSProperties | undefined = isDragging
-      ? draggingSourceStyle
-      : undefined;
+    const style: CSSProperties = isDragging
+      ? { ...draggingSourceStyle, touchAction: "none" }
+      : { touchAction: "none" };
 
     return (
       <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
