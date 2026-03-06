@@ -23,10 +23,12 @@ interface RoomBoardCardProps {
   readonly className?: string;
   readonly showDetails?: boolean | undefined;
   readonly assignmentDetails?: ReadonlyArray<AssignmentDetail> | undefined;
-  readonly dragHandleProps?: {
-    listeners: DraggableSyntheticListeners;
-    attributes: Record<string, unknown>;
-  } | undefined;
+  readonly dragHandleProps?:
+    | {
+        listeners: DraggableSyntheticListeners;
+        attributes: Record<string, unknown>;
+      }
+    | undefined;
 }
 
 export function RoomBoardCard({
@@ -68,13 +70,13 @@ export function RoomBoardCard({
       {dragHandleProps != null && (
         <button
           type="button"
-          className="absolute top-1 right-1 p-0.5 rounded text-text-secondary/50 hover:text-text-secondary hover:bg-surface cursor-grab active:cursor-grabbing transition-colors"
+          className="absolute top-2 right-2 p-2 rounded text-text-secondary/50 hover:text-text-secondary hover:bg-surface cursor-grab active:cursor-grabbing transition-colors"
           aria-label="Arrastar sala"
           onClick={(e) => e.stopPropagation()}
           {...dragHandleProps.listeners}
           {...dragHandleProps.attributes}
         >
-          <GripVertical size={14} aria-hidden="true" />
+          <GripVertical size={16} aria-hidden="true" />
         </button>
       )}
       <span className="text-xs text-text-secondary truncate w-full">
@@ -127,30 +129,35 @@ export function RoomBoardCard({
         </div>
       </div>
 
-      {showDetails === true && assignmentDetails != null && assignmentDetails.length > 0 && (
-        <div className="flex flex-col gap-1 border-t border-border pt-1.5 mt-0.5">
-          {assignmentDetails.map((detail, i) => (
-            <div key={`${detail.professionalName}-${String(i)}`} className="flex items-center gap-1.5">
-              <span
-                className="inline-block w-2 h-2 rounded-full shrink-0"
-                style={{ backgroundColor: detail.categoryColor }}
-              />
-              <span className="text-xs text-text-primary truncate flex-1">
-                {detail.professionalName}
-              </span>
-              <span
-                className="text-[10px] font-medium px-1.5 py-0.5 rounded-full truncate max-w-[100px]"
-                style={{
-                  backgroundColor: `${detail.categoryColor}20`,
-                  color: detail.categoryColor,
-                }}
+      {showDetails === true &&
+        assignmentDetails != null &&
+        assignmentDetails.length > 0 && (
+          <div className="flex flex-col gap-1 border-t border-border pt-1.5 mt-0.5">
+            {assignmentDetails.map((detail, i) => (
+              <div
+                key={`${detail.professionalName}-${String(i)}`}
+                className="flex items-center gap-1.5"
               >
-                {detail.categoryName}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+                <span
+                  className="inline-block w-2 h-2 rounded-full shrink-0"
+                  style={{ backgroundColor: detail.categoryColor }}
+                />
+                <span className="text-xs text-text-primary truncate flex-1">
+                  {detail.professionalName}
+                </span>
+                <span
+                  className="text-[10px] font-medium px-1.5 py-0.5 rounded-full truncate max-w-[100px]"
+                  style={{
+                    backgroundColor: `${detail.categoryColor}20`,
+                    color: detail.categoryColor,
+                  }}
+                >
+                  {detail.categoryName}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
     </div>
   );
 }
