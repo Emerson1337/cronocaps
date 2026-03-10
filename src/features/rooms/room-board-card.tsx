@@ -93,7 +93,7 @@ export function RoomBoardCard({
       <span className="text-xs text-text-secondary truncate w-full">
         {`Sala ${String(slotNumber)}`}
       </span>
-      <span className="text-sm font-semibold text-text-primary truncate w-full">
+      <span className="text-sm max-w-64 font-semibold text-text-primary truncate w-full">
         {activityLabel}
       </span>
       <div className="flex items-center justify-between w-full mt-1">
