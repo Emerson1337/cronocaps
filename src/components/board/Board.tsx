@@ -44,7 +44,7 @@ export function Board({
         className="grid gap-4 p-4"
         style={{
           gridTemplateColumns: `repeat(${String(days.length)}, minmax(314px, 1fr))`,
-          gridTemplateRows: `auto repeat(${String(shifts.length)}, 1fr)`,
+          gridTemplateRows: `auto repeat(${String(shifts.length)}, auto)`,
         }}
       >
         {days.map((day) => (

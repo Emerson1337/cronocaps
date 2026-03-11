@@ -50,7 +50,7 @@ export const DroppableShiftZone = React.memo(function DroppableShiftZone({
     <div
       ref={setNodeRef}
       className={cn(
-        "relative rounded-xl transition-all duration-200",
+        "relative rounded-xl transition-all duration-200 h-full",
         isDisabled &&
           "opacity-50 cursor-not-allowed",
         isActiveTarget &&

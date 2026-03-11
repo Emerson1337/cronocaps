@@ -53,7 +53,7 @@ function ShiftSectionComponent({
     <div
       data-droppable-id={droppableId}
       className={cn(
-        "flex flex-col gap-2 rounded-xl border p-3 min-h-[100px] transition-colors duration-150",
+        "flex flex-col gap-2 rounded-xl border p-3 min-h-[100px] h-full transition-colors duration-150",
         isDragOver === true
           ? "border-primary bg-primary-light/30"
           : isDropTarget === true
