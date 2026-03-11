@@ -112,14 +112,28 @@ function ColorPicker({
                 setOpen(false);
               }}
               className={`w-6 h-6 rounded-full border border-border hover:scale-110 transition-transform cursor-pointer ${
-                preset.value === "" ? "flex items-center justify-center bg-surface" : ""
+                preset.value === ""
+                  ? "flex items-center justify-center bg-surface"
+                  : ""
               }`}
-              style={preset.value ? { backgroundColor: preset.value } : undefined}
+              style={
+                preset.value ? { backgroundColor: preset.value } : undefined
+              }
               aria-label={preset.label}
               title={preset.label}
             >
               {preset.value === "" && (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-secondary">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-text-secondary"
+                >
                   <line x1="4" y1="4" x2="20" y2="20" />
                   <circle cx="12" cy="12" r="10" />
                 </svg>
@@ -238,7 +252,7 @@ export function RichTextEditor({
 
   return (
     <div className="flex flex-col gap-1">
-      {label && (
+      {label != null && (
         <label className="text-sm font-semibold text-text-primary">
           {label}
         </label>
@@ -247,14 +261,32 @@ export function RichTextEditor({
       {/* Toolbar */}
       <div className="flex items-center gap-0.5 flex-wrap rounded-t-lg border border-border bg-surface-card px-1.5 py-1">
         <ToolbarButton onClick={() => execCmd("bold")} label="Negrito">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
             <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
           </svg>
         </ToolbarButton>
 
         <ToolbarButton onClick={() => execCmd("italic")} label="Itálico">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <line x1="19" y1="4" x2="10" y2="4" />
             <line x1="14" y1="20" x2="5" y2="20" />
             <line x1="15" y1="4" x2="9" y2="20" />
@@ -262,14 +294,32 @@ export function RichTextEditor({
         </ToolbarButton>
 
         <ToolbarButton onClick={() => execCmd("underline")} label="Sublinhado">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3" />
             <line x1="4" y1="21" x2="20" y2="21" />
           </svg>
         </ToolbarButton>
 
         <ToolbarButton onClick={() => execCmd("strikeThrough")} label="Tachado">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M17.3 4.9c-1.2-.8-2.8-1.4-5.3-1.4-3.2 0-5.5 1.7-5.5 4.2 0 1 .3 1.8.8 2.3" />
             <path d="M3 12h18" />
             <path d="M7.7 16.2c1 1.1 2.8 1.8 5.3 1.8 3.2 0 5.5-1.7 5.5-4.2 0-.6-.1-1.2-.4-1.8" />
@@ -289,14 +339,24 @@ export function RichTextEditor({
           }}
         />
 
-        <FontSizePicker
-          onSelectSize={(size) => execCmd("fontSize", size)}
-        />
+        <FontSizePicker onSelectSize={(size) => execCmd("fontSize", size)} />
 
         <div className="w-px h-5 bg-border mx-1" />
 
-        <ToolbarButton onClick={() => execCmd("insertUnorderedList")} label="Lista">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <ToolbarButton
+          onClick={() => execCmd("insertUnorderedList")}
+          label="Lista"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <line x1="8" y1="6" x2="21" y2="6" />
             <line x1="8" y1="12" x2="21" y2="12" />
             <line x1="8" y1="18" x2="21" y2="18" />
@@ -316,7 +376,7 @@ export function RichTextEditor({
         className="min-h-[160px] max-h-[400px] overflow-y-auto rounded-b-lg border border-t-0 border-border bg-surface px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary prose prose-sm max-w-none [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-1 [&_li]:my-0.5 [&_strong]:font-bold [&_u]:underline [&_s]:line-through [&_strike]:line-through"
       />
 
-      {helperText && (
+      {helperText != null && (
         <span className="text-xs text-text-secondary">{helperText}</span>
       )}
     </div>
