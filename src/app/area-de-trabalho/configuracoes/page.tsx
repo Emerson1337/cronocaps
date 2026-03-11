@@ -8,6 +8,7 @@ import { ProfessionalFormModal } from "@/features/professionals/professional-for
 import { DeleteProfessionalDialog } from "@/features/professionals/delete-professional-dialog";
 import { CategoryManager } from "@/features/professionals/category-manager";
 import { Button, IconButton, Input, Select } from "@/components/ui";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 import type { Workspace, Professional, Shift } from "@/types";
 
@@ -170,6 +171,17 @@ export default function SettingsPage() {
     [safeUpdateWorkspace]
   );
 
+  const handleExportRulesChange = useCallback(
+    (html: string) => {
+      safeUpdateWorkspace((prev) => ({
+        ...prev,
+        exportRules: html,
+        updatedAt: new Date().toISOString(),
+      }));
+    },
+    [safeUpdateWorkspace]
+  );
+
   if (!isLoaded || workspace === null) {
     return (
       <main className="flex min-h-dvh items-center justify-center p-4">
@@ -203,7 +215,7 @@ export default function SettingsPage() {
         <h1 className="text-lg font-semibold text-text-primary">Configurações</h1>
       </header>
 
-      <div className="flex-1 overflow-y-auto scrollbar-minimal px-4 py-4 max-w-5xl mx-auto w-full">
+      <div className="flex-1 overflow-y-auto scrollbar-minimal px-4 py-4 max-w-5xl mx-auto w-full flex flex-col gap-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Left column: Professionals + Categories */}
           <div className="flex flex-col gap-6">
@@ -399,6 +411,16 @@ export default function SettingsPage() {
             </section>
           </div>
         </div>
+
+        {/* Export Rules Section */}
+        <section className="flex flex-col gap-2">
+          <RichTextEditor
+            label="Observações do Cronograma (PDF)"
+            value={workspace.exportRules}
+            onChange={handleExportRulesChange}
+            helperText="Estas observações serão exibidas na primeira página do PDF exportado."
+          />
+        </section>
       </div>
 
       {/* Modals */}

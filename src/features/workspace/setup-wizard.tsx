@@ -15,6 +15,7 @@ import {
   MAX_ROOMS,
   MAX_PROFESSIONALS,
   MAX_CATEGORIES,
+  DEFAULT_EXPORT_RULES,
 } from "@/lib/constants";
 import type {
   WeekDay,
@@ -757,6 +758,7 @@ export function SetupWizard({ onComplete, onCancel }: SetupWizardProps) {
       shifts: finalShifts,
       roomsPerShift: roomCount,
       activityPresets: DEFAULT_ACTIVITY_PRESETS,
+      exportRules: DEFAULT_EXPORT_RULES,
       professionals: finalProfessionals,
       categories: [...categories],
       allocations: [],

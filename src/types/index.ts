@@ -58,6 +58,7 @@ export interface Workspace {
   readonly professionals: ReadonlyArray<Professional>;
   readonly categories: ReadonlyArray<Category>;
   readonly allocations: ReadonlyArray<Allocation>;
+  readonly exportRules: string;
   readonly createdAt: string;
   readonly updatedAt: string;
 }

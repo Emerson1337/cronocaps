@@ -1,5 +1,5 @@
 import { generateId } from "@/lib/utils";
-import { DEFAULT_WEEKDAYS } from "@/lib/constants";
+import { DEFAULT_WEEKDAYS, DEFAULT_EXPORT_RULES } from "@/lib/constants";
 import type { Workspace, Category, Professional, Shift } from "@/types";
 
 const DEFAULT_ACTIVITY_PRESETS: ReadonlyArray<string> = [
@@ -91,6 +91,7 @@ export function createCapsTemplate(): Workspace {
     professionals,
     categories,
     allocations: [],
+    exportRules: DEFAULT_EXPORT_RULES,
     createdAt: now,
     updatedAt: now,
   };

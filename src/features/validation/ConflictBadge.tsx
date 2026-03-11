@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import { AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ConflictBadgeProps {
@@ -12,7 +12,6 @@ interface ConflictBadgeProps {
 export function ConflictBadge({ conflictCount, hasErrors, onClick }: ConflictBadgeProps) {
   if (conflictCount === 0) return null;
 
-  const variant = hasErrors ? "error" : "warning";
   const label = conflictCount === 1 ? "conflito" : "conflitos";
 
   return (
@@ -21,14 +20,14 @@ export function ConflictBadge({ conflictCount, hasErrors, onClick }: ConflictBad
       onClick={onClick}
       className={cn(
         "min-h-[44px] min-w-[44px] cursor-pointer rounded-lg p-1",
-        "flex items-center justify-center",
-        "active:scale-95 transition-transform"
+        "flex items-center justify-center gap-1",
+        "active:scale-95 transition-transform",
+        hasErrors ? "text-error" : "text-warning"
       )}
       aria-label={`${String(conflictCount)} ${label} encontrado${conflictCount === 1 ? "" : "s"}`}
     >
-      <Badge variant={variant} className={cn("px-3 py-1 text-sm", hasErrors ? "" : "animate-conflict-pulse")}>
-        {String(conflictCount)} {label}
-      </Badge>
+      <AlertTriangle size={18} className={cn(!hasErrors && "animate-conflict-pulse")} aria-hidden="true" />
+      <span className="text-sm font-semibold">{String(conflictCount)}</span>
     </button>
   );
 }

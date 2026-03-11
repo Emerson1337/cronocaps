@@ -146,6 +146,336 @@ const PAGE_MARGIN = 14;
 const HEADER_HEIGHT = 18;
 const FOOTER_HEIGHT = 12;
 
+// ── HTML Rules Renderer ─────────────────────────────────────
+
+interface TextSegment {
+  text: string;
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  strikethrough: boolean;
+  color: string | null; // hex color or null for default
+  fontSize: number | null; // point size or null for default
+}
+
+interface StyleState {
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  strikethrough: boolean;
+  color: string | null;
+  fontSize: number | null;
+}
+
+// Map HTML font size (1-7) to PDF point sizes
+function htmlFontSizeToPt(size: string): number | null {
+  const sizeMap: Record<string, number> = {
+    "1": 7, "2": 8, "3": 9, "4": 10, "5": 12, "6": 14, "7": 18,
+  };
+  return sizeMap[size] ?? null;
+}
+
+function parseColorFromStyle(style: string): string | null {
+  // Match color in style attribute: color: rgb(r,g,b) or color: #hex
+  const rgbMatch = style.match(/color:\s*rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+  if (rgbMatch) {
+    const r = parseInt(rgbMatch[1]!, 10);
+    const g = parseInt(rgbMatch[2]!, 10);
+    const b = parseInt(rgbMatch[3]!, 10);
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+  }
+  const hexMatch = style.match(/color:\s*(#[0-9a-fA-F]{3,6})/i);
+  if (hexMatch) {
+    return hexMatch[1]!;
+  }
+  return null;
+}
+
+function parseColorFromAttr(attr: string): string | null {
+  // font color="..." can be hex or named color
+  if (attr.startsWith("#")) return attr;
+  // Named colors mapping (common ones from execCommand)
+  const named: Record<string, string> = {
+    red: "#ff0000", blue: "#0000ff", green: "#008000",
+    black: "#000000", orange: "#ffa500", purple: "#800080",
+    gray: "#808080", grey: "#808080",
+  };
+  return named[attr.toLowerCase()] ?? attr;
+}
+
+function parseInlineHtml(html: string): TextSegment[] {
+  const segments: TextSegment[] = [];
+  const styleStack: StyleState[] = [
+    { bold: false, italic: false, underline: false, strikethrough: false, color: null, fontSize: null },
+  ];
+
+  function currentStyle(): StyleState {
+    return styleStack[styleStack.length - 1]!;
+  }
+
+  // Tokenize: split into tags and text
+  const tokenPattern = /<\/?[^>]+>|[^<]+/g;
+  let token: RegExpExecArray | null;
+
+  while ((token = tokenPattern.exec(html)) !== null) {
+    const t = token[0];
+
+    if (t.startsWith("</")) {
+      // Closing tag — pop style
+      if (styleStack.length > 1) {
+        styleStack.pop();
+      }
+    } else if (t.startsWith("<")) {
+      // Opening tag — push new style inheriting from current
+      const prev = currentStyle();
+      const newStyle: StyleState = { ...prev };
+
+      const tagNameMatch = t.match(/^<(\w+)/);
+      if (tagNameMatch) {
+        const tagName = tagNameMatch[1]!.toLowerCase();
+        if (tagName === "strong" || tagName === "b") {
+          newStyle.bold = true;
+        } else if (tagName === "em" || tagName === "i") {
+          newStyle.italic = true;
+        } else if (tagName === "u") {
+          newStyle.underline = true;
+        } else if (tagName === "s" || tagName === "strike" || tagName === "del") {
+          newStyle.strikethrough = true;
+        } else if (tagName === "span") {
+          const styleMatch = t.match(/style="([^"]*)"/i);
+          if (styleMatch) {
+            const color = parseColorFromStyle(styleMatch[1]!);
+            if (color) newStyle.color = color;
+          }
+        } else if (tagName === "font") {
+          const colorMatch = t.match(/color="([^"]*)"/i);
+          if (colorMatch) {
+            const color = parseColorFromAttr(colorMatch[1]!);
+            if (color) newStyle.color = color;
+          }
+          const sizeMatch = t.match(/size="([^"]*)"/i);
+          if (sizeMatch) {
+            const ptSize = htmlFontSizeToPt(sizeMatch[1]!);
+            if (ptSize !== null) newStyle.fontSize = ptSize;
+          }
+        }
+      }
+
+      // Self-closing tags (like <br/>) shouldn't push to stack
+      if (t.endsWith("/>") || /^<br\s*/i.test(t)) {
+        // don't push
+      } else {
+        styleStack.push(newStyle);
+      }
+    } else {
+      // Text node
+      const text = t;
+      if (text.length > 0) {
+        const style = currentStyle();
+        segments.push({
+          text,
+          bold: style.bold,
+          italic: style.italic,
+          underline: style.underline,
+          strikethrough: style.strikethrough,
+          color: style.color,
+          fontSize: style.fontSize,
+        });
+      }
+    }
+  }
+
+  return segments;
+}
+
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ");
+}
+
+function renderStyledChunk(
+  doc: jsPDF,
+  segment: TextSegment,
+  chunkText: string,
+  lineX: number,
+  cursorY: number,
+  defaultFontSize: number
+): void {
+  let fontStyle = "normal";
+  if (segment.bold && segment.italic) fontStyle = "bolditalic";
+  else if (segment.bold) fontStyle = "bold";
+  else if (segment.italic) fontStyle = "italic";
+
+  doc.setFont("helvetica", fontStyle);
+  doc.setFontSize(segment.fontSize ?? defaultFontSize);
+
+  if (segment.color) {
+    const rgb = hexToRgb(segment.color);
+    doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+  } else {
+    doc.setTextColor(...COLORS.textPrimary);
+  }
+
+  doc.text(chunkText, lineX, cursorY);
+  const textWidth = doc.getTextWidth(chunkText);
+
+  if (segment.underline) {
+    const colorRgb = segment.color ? hexToRgb(segment.color) : COLORS.textPrimary;
+    doc.setDrawColor(colorRgb[0], colorRgb[1], colorRgb[2]);
+    doc.setLineWidth(0.2);
+    doc.line(lineX, cursorY + 0.5, lineX + textWidth, cursorY + 0.5);
+  }
+
+  if (segment.strikethrough) {
+    const colorRgb = segment.color ? hexToRgb(segment.color) : COLORS.textPrimary;
+    doc.setDrawColor(colorRgb[0], colorRgb[1], colorRgb[2]);
+    doc.setLineWidth(0.2);
+    doc.line(lineX, cursorY - 1, lineX + textWidth, cursorY - 1);
+  }
+}
+
+function renderHtmlRules(
+  doc: jsPDF,
+  html: string,
+  x: number,
+  startY: number,
+  maxWidth: number,
+  maxY: number,
+  addNewPage: () => void,
+  contentStartY: () => number
+): number {
+  let cursorY = startY;
+  const bulletIndent = 6;
+  const bulletTextX = x + bulletIndent;
+  const textMaxWidth = maxWidth - bulletIndent;
+  const lineHeight = 4.5;
+  const itemSpacing = 3;
+  const fontSize = 9;
+
+  // Extract <li> content from HTML
+  const liPattern = /<li[^>]*>([\s\S]*?)<\/li>/gi;
+  const items: string[] = [];
+  let liMatch: RegExpExecArray | null;
+  while ((liMatch = liPattern.exec(html)) !== null) {
+    items.push(liMatch[1] ?? "");
+  }
+
+  // If no list items found, render as styled plain text
+  if (items.length === 0) {
+    const segments = parseInlineHtml(html);
+    const fullText = decodeHtmlEntities(segments.map((s) => s.text).join(""));
+    if (fullText.trim().length === 0) return cursorY;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(fontSize);
+    const wrappedLines = doc.splitTextToSize(fullText, maxWidth) as string[];
+
+    let charOffset = 0;
+    for (const wrappedLine of wrappedLines) {
+      if (cursorY + lineHeight > maxY) {
+        addNewPage();
+        cursorY = contentStartY();
+      }
+
+      const lineLen = wrappedLine.length;
+      let lineX = x;
+      let segStart = 0;
+
+      for (const segment of segments) {
+        const segText = decodeHtmlEntities(segment.text);
+        const segEnd = segStart + segText.length;
+        const overlapStart = Math.max(charOffset, segStart);
+        const overlapEnd = Math.min(charOffset + lineLen, segEnd);
+
+        if (overlapStart < overlapEnd) {
+          const chunkText = segText.slice(overlapStart - segStart, overlapEnd - segStart);
+          renderStyledChunk(doc, segment, chunkText, lineX, cursorY, fontSize);
+          lineX += doc.getTextWidth(chunkText);
+        }
+        segStart = segEnd;
+      }
+
+      charOffset += lineLen;
+      while (charOffset < fullText.length && fullText[charOffset] === " ") {
+        charOffset++;
+      }
+      cursorY += lineHeight;
+    }
+    return cursorY;
+  }
+
+  for (const itemHtml of items) {
+    const segments = parseInlineHtml(itemHtml);
+
+    // Build the full text to measure line wrapping
+    const fullText = decodeHtmlEntities(segments.map((s) => s.text).join(""));
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(fontSize);
+    const wrappedLines = doc.splitTextToSize(fullText, textMaxWidth) as string[];
+    const totalItemHeight = wrappedLines.length * lineHeight;
+
+    // Check if we need a new page
+    if (cursorY + totalItemHeight > maxY) {
+      addNewPage();
+      cursorY = contentStartY();
+    }
+
+    // Draw bullet
+    doc.setFillColor(...COLORS.textPrimary);
+    doc.circle(x + 1.5, cursorY - 1, 0.8, "F");
+
+    // Render segments with word wrapping and mixed styles
+    let charOffset = 0;
+    for (const wrappedLine of wrappedLines) {
+      const lineLen = wrappedLine.length;
+      let lineX = bulletTextX;
+
+      // Find which segments cover this line range
+      let segStart = 0;
+      for (const segment of segments) {
+        const segText = decodeHtmlEntities(segment.text);
+        const segEnd = segStart + segText.length;
+
+        // Calculate overlap with current line
+        const overlapStart = Math.max(charOffset, segStart);
+        const overlapEnd = Math.min(charOffset + lineLen, segEnd);
+
+        if (overlapStart < overlapEnd) {
+          const chunkText = segText.slice(
+            overlapStart - segStart,
+            overlapEnd - segStart
+          );
+
+          renderStyledChunk(doc, segment, chunkText, lineX, cursorY, fontSize);
+          lineX += doc.getTextWidth(chunkText);
+        }
+
+        segStart = segEnd;
+      }
+
+      charOffset += lineLen;
+      // Skip whitespace that was consumed by line break
+      while (
+        charOffset < fullText.length &&
+        fullText[charOffset] === " "
+      ) {
+        charOffset++;
+      }
+
+      cursorY += lineHeight;
+    }
+
+    cursorY += itemSpacing;
+  }
+
+  return cursorY;
+}
+
 // ── Main generator ───────────────────────────────────────────────
 
 export function generateSchedulePdf(input: PdfGeneratorInput): void {
@@ -222,12 +552,45 @@ export function generateSchedulePdf(input: PdfGeneratorInput): void {
     return pageHeight - FOOTER_HEIGHT - 4;
   }
 
-  // ── Day pages ────────────────────────────────────────────────
+  // ── Rules page (first page) ─────────────────────────────────
 
   drawHeader();
 
+  if (workspace.exportRules.trim().length > 0) {
+    let rulesY = contentStartY();
+
+    // Title
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.setTextColor(...COLORS.textPrimary);
+    const titleText = workspace.name.toUpperCase();
+    const titleWidth = doc.getTextWidth(titleText);
+    doc.text(titleText, (pageWidth - titleWidth) / 2, rulesY);
+    rulesY += 10;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(...COLORS.primary);
+    const subTitle = "OBSERVAÇÕES:";
+    const subTitleWidth = doc.getTextWidth(subTitle);
+    doc.text(subTitle, (pageWidth - subTitleWidth) / 2, rulesY);
+    rulesY += 10;
+
+    // Parse HTML and render
+    rulesY = renderHtmlRules(doc, workspace.exportRules, PAGE_MARGIN + 4, rulesY, pageWidth - PAGE_MARGIN * 2 - 8, contentMaxY(), addNewPage, contentStartY);
+
+    // Start day pages on a new page
+    addNewPage();
+  }
+
+  // ── Day pages ────────────────────────────────────────────────
+
+  if (workspace.exportRules.trim().length === 0) {
+    drawHeader();
+  }
+
   for (const day of workspace.days) {
-    if (day !== workspace.days[0]) {
+    if (day !== workspace.days[0] || workspace.exportRules.trim().length > 0) {
       addNewPage();
     }
 

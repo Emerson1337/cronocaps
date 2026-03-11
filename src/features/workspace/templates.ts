@@ -1,5 +1,5 @@
 import { generateId } from "@/lib/utils";
-import { DEFAULT_WEEKDAYS } from "@/lib/constants";
+import { DEFAULT_WEEKDAYS, DEFAULT_EXPORT_RULES } from "@/lib/constants";
 import type { Workspace, Category, Professional, Shift, WeekDay } from "@/types";
 
 export interface TemplateInfo {
@@ -63,6 +63,7 @@ function buildWorkspace(
     professionals,
     categories,
     allocations: [],
+    exportRules: DEFAULT_EXPORT_RULES,
     createdAt: now,
     updatedAt: now,
   };

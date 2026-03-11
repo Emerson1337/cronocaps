@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
+import { DEFAULT_EXPORT_RULES } from "@/lib/constants";
 import type { Workspace } from "@/types";
 
 const subscribeNoop = () => () => {};
@@ -22,12 +23,19 @@ function migrateWorkspace(raw: unknown): Workspace | null {
   if (raw === null || raw === undefined || typeof raw !== "object") return null;
   const ws = raw as Record<string, unknown>;
 
-  // Already migrated — ensure activityPresets exists
+  // Already migrated — ensure activityPresets and exportRules exist
   if (typeof ws["roomsPerShift"] === "number") {
+    let patched = false;
+    let result = ws;
     if (!Array.isArray(ws["activityPresets"])) {
-      return { ...ws, activityPresets: [...DEFAULT_ACTIVITY_PRESETS] } as unknown as Workspace;
+      result = { ...result, activityPresets: [...DEFAULT_ACTIVITY_PRESETS] };
+      patched = true;
     }
-    return raw as Workspace;
+    if (typeof ws["exportRules"] !== "string") {
+      result = { ...result, exportRules: DEFAULT_EXPORT_RULES };
+      patched = true;
+    }
+    return (patched ? result : raw) as Workspace;
   }
 
   // Legacy workspace with rooms array
@@ -49,6 +57,7 @@ function migrateWorkspace(raw: unknown): Workspace | null {
     ...rest,
     roomsPerShift: roomCount,
     activityPresets: [...DEFAULT_ACTIVITY_PRESETS],
+    exportRules: DEFAULT_EXPORT_RULES,
     allocations: migratedAllocations,
     updatedAt: new Date().toISOString(),
   } as unknown as Workspace;
