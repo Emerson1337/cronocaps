@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowUp, FolderOpen } from "lucide-react";
 import { useWorkspace } from "@/features/workspace/use-workspace";
 import { useProfessionals } from "@/features/professionals/use-professionals";
 import { ProfessionalFormModal } from "@/features/professionals/professional-form-modal";
 import { DeleteProfessionalDialog } from "@/features/professionals/delete-professional-dialog";
 import { CategoryManager } from "@/features/professionals/category-manager";
 import { Button, IconButton, Input, Select } from "@/components/ui";
+import { cn } from "@/lib/utils";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { ToastProvider, useToast } from "@/components/ui/toast";
 
 import type { Workspace, Professional, Shift } from "@/types";
 
@@ -53,6 +56,15 @@ const BACK_ICON = (
 );
 
 export default function SettingsPage() {
+  return (
+    <ToastProvider>
+      <SettingsPageInner />
+    </ToastProvider>
+  );
+}
+
+function SettingsPageInner() {
+  const { showToast } = useToast();
   const router = useRouter();
   const { workspace, updateWorkspace: rawUpdateWorkspace, isLoaded } = useWorkspace();
 
@@ -86,6 +98,13 @@ export default function SettingsPage() {
 
   // Activity presets
   const [newPreset, setNewPreset] = useState("");
+
+  // Import JSON
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Scroll to top
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Redirect if no workspace
   useEffect(() => {
@@ -182,6 +201,42 @@ export default function SettingsPage() {
     [safeUpdateWorkspace]
   );
 
+  const handleImportJson = useCallback(
+    (file: File) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target?.result as string);
+          if (
+            typeof parsed !== "object" ||
+            parsed === null ||
+            typeof parsed.id !== "string" ||
+            typeof parsed.name !== "string"
+          ) {
+            showToast("Arquivo inválido: não é uma configuração válida.", "info");
+            return;
+          }
+          rawUpdateWorkspace(parsed as Workspace);
+          showToast(`Configuração "${parsed.name}" importada com sucesso.`, "success");
+        } catch {
+          showToast("Erro ao ler o arquivo JSON.", "info");
+        }
+      };
+      reader.readAsText(file);
+    },
+    [rawUpdateWorkspace, showToast]
+  );
+
+  const handleScroll = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (el === null) return;
+    setShowScrollTop(el.scrollTop > 100);
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    scrollContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   if (!isLoaded || workspace === null) {
     return (
       <main className="flex min-h-dvh items-center justify-center p-4">
@@ -201,7 +256,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <main className="flex flex-col min-h-dvh bg-surface animate-fade-in">
+    <main className="flex flex-col h-dvh overflow-hidden bg-surface animate-fade-in">
       {/* Header */}
       <header className="flex items-center gap-3 border-b border-border bg-surface-card px-4 py-2 shrink-0">
         <button
@@ -215,7 +270,36 @@ export default function SettingsPage() {
         <h1 className="text-lg font-semibold text-text-primary">Configurações</h1>
       </header>
 
-      <div className="flex-1 overflow-y-auto scrollbar-minimal px-4 py-4 max-w-5xl mx-auto w-full flex flex-col gap-6">
+      <div
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto scrollbar-minimal px-4 py-4 max-w-5xl mx-auto w-full flex flex-col gap-6"
+      >
+        {/* Import JSON Section */}
+        <section className="flex flex-col gap-2">
+          <h2 className="text-sm font-semibold text-text-primary">Importar Configuração</h2>
+          <p className="text-xs text-text-secondary">
+            Importe um arquivo JSON exportado anteriormente para restaurar uma configuração.
+          </p>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                handleImportJson(file);
+                e.target.value = "";
+              }
+            }}
+          />
+          <Button size="sm" variant="secondary" onClick={() => fileInputRef.current?.click()} className="self-start flex items-center gap-1.5">
+            <FolderOpen size={16} />
+            Importar JSON
+          </Button>
+        </section>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Left column: Professionals + Categories */}
           <div className="flex flex-col gap-6">
@@ -421,7 +505,22 @@ export default function SettingsPage() {
             helperText="Estas observações serão exibidas na primeira página do PDF exportado."
           />
         </section>
+
       </div>
+
+      {/* Scroll to top floating button */}
+      <button
+        type="button"
+        onClick={scrollToTop}
+        className={cn(
+          "fixed bottom-4 right-4 z-50 flex items-center justify-center w-10 h-10 rounded-full border border-border bg-surface-card/80 backdrop-blur-sm shadow-lg text-text-secondary hover:text-text-primary hover:bg-surface transition-all cursor-pointer",
+          showScrollTop ? "opacity-100 scale-100" : "opacity-0 scale-75 pointer-events-none"
+        )}
+        aria-label="Voltar ao topo"
+        title="Voltar ao topo"
+      >
+        <ArrowUp size={18} />
+      </button>
 
       {/* Modals */}
       <ProfessionalFormModal

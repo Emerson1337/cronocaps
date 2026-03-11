@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Undo2, Redo2, LayoutList, Menu, X } from "lucide-react";
+import { Undo2, Redo2, LayoutList, Menu, X, Save } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/toggle";
 import { ConflictBadge } from "@/features/validation";
 import { cn } from "@/lib/utils";
 
 interface FloatingToolbarProps {
+  readonly onSaveJson: () => void;
   readonly onExport: () => void;
   readonly conflictCount: number;
   readonly hasErrors: boolean;
@@ -21,6 +22,7 @@ interface FloatingToolbarProps {
 }
 
 export function FloatingToolbar({
+  onSaveJson,
   onExport,
   conflictCount,
   hasErrors,
@@ -115,6 +117,16 @@ export function FloatingToolbar({
         title="Detalhes das salas"
       >
         <LayoutList size={18} />
+      </button>
+
+      <button
+        type="button"
+        onClick={onSaveJson}
+        className="flex items-center justify-center w-full min-w-10 h-10 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface transition-colors cursor-pointer"
+        aria-label="Salvar configuração"
+        title="Salvar configuração"
+      >
+        <Save size={18} />
       </button>
 
       <button

@@ -355,6 +355,22 @@ function WorkspacePageInner() {
     [workspace, copiedRoom, undoableUpdate, showToast, clearClipboard]
   );
 
+  const handleSaveWorkspaceJson = useCallback(() => {
+    if (workspace === null) return;
+    const blob = new Blob([JSON.stringify(workspace, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const sanitizedName = workspace.name.replace(/[^a-zA-Z0-9À-ÿ _-]/g, "").trim() || "workspace";
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${sanitizedName}-config.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [workspace]);
+
   const getConflictStyleForAllocation = useCallback(
     (allocationId: string): string => {
       return getAllocationConflictStyle(conflicts, allocationId);
@@ -379,6 +395,7 @@ function WorkspacePageInner() {
       <main className="flex flex-col h-dvh overflow-hidden animate-fade-in">
         {/* Floating toolbar (top-right) */}
         <FloatingToolbar
+          onSaveJson={handleSaveWorkspaceJson}
           onExport={() => setIsExportModalOpen(true)}
           conflictCount={conflictCount}
           hasErrors={hasErrors}
