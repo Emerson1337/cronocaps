@@ -13,7 +13,6 @@ export interface AssignmentDetail {
 }
 
 interface RoomBoardCardProps {
-  readonly slotNumber: number;
   readonly activityLabel: string;
   readonly assignmentCount: number;
   readonly onTap: () => void;
@@ -33,7 +32,6 @@ interface RoomBoardCardProps {
 }
 
 export function RoomBoardCard({
-  slotNumber,
   activityLabel,
   assignmentCount,
   onTap,
@@ -90,9 +88,6 @@ export function RoomBoardCard({
           <GripVertical size={16} aria-hidden="true" />
         </div>
       )}
-      <span className="text-xs text-text-secondary truncate w-full">
-        {`Sala ${String(slotNumber)}`}
-      </span>
       <span className="text-sm max-w-64 font-semibold text-text-primary truncate w-full">
         {activityLabel}
       </span>

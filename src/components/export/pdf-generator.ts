@@ -655,10 +655,9 @@ export function generateSchedulePdf(input: PdfGeneratorInput): void {
       );
 
       // Head row: activity labels with colored backgrounds
-      const headRow: CellDef[] = allocations.map((allocation, idx) => {
-        const headerText = `${allocation.activityLabel.toUpperCase()}\nSala ${String(idx + 1)}`;
+      const headRow: CellDef[] = allocations.map((allocation) => {
         return {
-          content: headerText,
+          content: allocation.activityLabel.toUpperCase(),
           styles: {
             fillColor: toMutableRgb(COLORS.primary),
             textColor: toMutableRgb(COLORS.white),

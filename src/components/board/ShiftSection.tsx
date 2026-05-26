@@ -110,7 +110,7 @@ function ShiftSectionComponent({
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          {allocations.map((allocation, index) => {
+          {allocations.map((allocation) => {
             const conflictClassName = getConflictStyle(allocation.id);
             const hasConflict = conflictClassName.length > 0;
 
@@ -154,7 +154,6 @@ function ShiftSectionComponent({
                     )}
                   >
                     <RoomBoardCard
-                      slotNumber={index + 1}
                       activityLabel={allocation.activityLabel}
                       assignmentCount={allocation.assignments.length}
                       onTap={() => onAllocationTap(allocation.id)}
