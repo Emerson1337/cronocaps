@@ -19,6 +19,10 @@ const DEFAULT_ACTIVITY_PRESETS: ReadonlyArray<string> = [
   "Atendimento de Enfermagem",
 ];
 
+function stripSalaPrefix(label: string): string {
+  return label.replace(/^Sala\s+de\s+/i, "").replace(/^Sala\s+/i, "");
+}
+
 function migrateWorkspace(raw: unknown): Workspace | null {
   if (raw === null || raw === undefined || typeof raw !== "object") return null;
   const ws = raw as Record<string, unknown>;
@@ -30,10 +34,37 @@ function migrateWorkspace(raw: unknown): Workspace | null {
     if (!Array.isArray(ws["activityPresets"])) {
       result = { ...result, activityPresets: [...DEFAULT_ACTIVITY_PRESETS] };
       patched = true;
+    } else {
+      const presets = ws["activityPresets"] as ReadonlyArray<unknown>;
+      const cleaned = presets.map((p) =>
+        typeof p === "string" ? stripSalaPrefix(p) : p
+      );
+      if (cleaned.some((p, i) => p !== presets[i])) {
+        result = { ...result, activityPresets: cleaned };
+        patched = true;
+      }
     }
     if (typeof ws["exportRules"] !== "string") {
       result = { ...result, exportRules: DEFAULT_EXPORT_RULES };
       patched = true;
+    }
+    const allocations = ws["allocations"];
+    if (Array.isArray(allocations)) {
+      let allocationsChanged = false;
+      const cleanedAllocations = allocations.map((a: unknown) => {
+        if (a === null || typeof a !== "object") return a;
+        const alloc = a as Record<string, unknown>;
+        const label = alloc["activityLabel"];
+        if (typeof label !== "string") return a;
+        const cleaned = stripSalaPrefix(label);
+        if (cleaned === label) return a;
+        allocationsChanged = true;
+        return { ...alloc, activityLabel: cleaned };
+      });
+      if (allocationsChanged) {
+        result = { ...result, allocations: cleanedAllocations };
+        patched = true;
+      }
     }
     return (patched ? result : raw) as Workspace;
   }

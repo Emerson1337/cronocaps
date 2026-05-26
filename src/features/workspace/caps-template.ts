@@ -3,18 +3,18 @@ import { DEFAULT_WEEKDAYS, DEFAULT_EXPORT_RULES } from "@/lib/constants";
 import type { Workspace, Category, Professional, Shift } from "@/types";
 
 const DEFAULT_ACTIVITY_PRESETS: ReadonlyArray<string> = [
-  "Sala de Acolhimento Inicial",
-  "Sala de Acolhimento de Seguimento",
-  "Sala de Psicoterapia",
-  "Sala de Atendimento Social",
-  "Sala de Atendimento de Enfermagem / Regulação U.D",
-  "Sala de Consulta Médica",
-  "Sala de Matriciamento",
-  "Sala de Atendimento",
-  "Sala de Grupo",
-  "Sala de Enfermagem",
-  "Sala de Grupos",
-  "Sala de Plantão Psicológico",
+  "Acolhimento Inicial",
+  "Acolhimento de Seguimento",
+  "Psicoterapia",
+  "Atendimento Social",
+  "Atendimento de Enfermagem / Regulação U.D",
+  "Consulta Médica",
+  "Matriciamento",
+  "Atendimento",
+  "Grupo",
+  "Enfermagem",
+  "Grupos",
+  "Plantão Psicológico",
 ];
 
 export function createCapsTemplate(): Workspace {
